@@ -11,14 +11,20 @@ const Login = lazy(() => import('./component/Login'));
 const Home = lazy(() => import('./pages/Home'));
 
 function App() {
+  const [showSignUp, setShowSignUp] = useState(true);
+
+  // Define the toggle function
+  const handleToggle = () => {
+    setShowSignUp(!showSignUp);
+  };
   return (
       <Router>
         <Header />
         <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login toggle={handleToggle} />} />
+          <Route path="/signup" element={<SignUp toggle={handleToggle} />} />
           <Route path="/post" element={<Post />} />
           <Route path="/posting" element={<Posting />} />
         </Routes>
