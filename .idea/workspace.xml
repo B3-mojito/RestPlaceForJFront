@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/j-front/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/pages/Home.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Home.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +71,7 @@
       <workItem from="1722379487784" duration="11583000" />
       <workItem from="1722582709862" duration="6435000" />
       <workItem from="1722672500511" duration="616000" />
-      <workItem from="1722713323973" duration="18828000" />
+      <workItem from="1722713323973" duration="22504000" />
     </task>
     <servers />
   </component>

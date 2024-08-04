@@ -5,6 +5,7 @@ import Header from "./component/Header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SignUp from "./component/SignUp";
 import Post from "./pages/Post";
+import Posting from "./pages/Posting";
 
 const Login = lazy(() => import('./component/Login'));
 const Home = lazy(() => import('./pages/Home'));
@@ -19,6 +20,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/post" element={<Post />} />
+          <Route path="/posting" element={<Posting />} />
         </Routes>
         </Suspense>
       </Router>
