@@ -1,64 +1,103 @@
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
-import React, {useState} from "react";
-import Button from "react-bootstrap/Button";
-import {ListGroup} from "react-bootstrap";
+import React, { useState, useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { ListGroup, Modal } from 'react-bootstrap';
 
 function Post() {
-  // State to manage selected options
   const [region, setRegion] = useState('');
   const [activity, setActivity] = useState('');
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [postDetails, setPostDetails] = useState(null); // State to hold post details
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
   const postsPerPage = 10;
-  // Sample data for posts
-  const posts = [
-    { id: 1, region: '서울', activity: '힐링', content: '서울에서 힐링하기 좋은 곳!' },
-    { id: 2, region: '대구', activity: '스릴', content: '대구에서 스릴 넘치는 활동!' },
-    { id: 3, region: '부산', activity: '캠핑', content: '부산에서 즐기는 캠핑!' },
-    { id: 4, region: '서울', activity: '스릴', content: '서울에서 스릴 넘치는 활동!' },
-    { id: 5, region: '대구', activity: '힐링', content: '대구에서 힐링하기 좋은 곳!' },
-    { id: 6, region: '부산', activity: '캠핑', content: '부산에서 즐기는 캠핑!' },
-    { id: 7, region: '서울', activity: '힐링', content: '서울에서 힐링하기 좋은 곳!' },
-    { id: 8, region: '대구', activity: '스릴', content: '대구에서 스릴 넘치는 활동!' },
-    { id: 9, region: '부산', activity: '캠핑', content: '부산에서 즐기는 캠핑!' },
-    { id: 10, region: '서울', activity: '힐링', content: '서울에서 힐링하기 좋은 곳!' },
-    { id: 11, region: '대구', activity: '스릴', content: '대구에서 스릴 넘치는 활동!' },
-    { id: 12, region: '부산', activity: '캠핑', content: '부산에서 즐기는 캠핑!' },
-    // Add more posts as needed
-  ];
+
   // Handle select changes
-  const handleRegionChange = (e) => {
-    setRegion(e.target.value);
+  const handleRegionChange = (e) => setRegion(e.target.value);
+  const handleActivityChange = (e) => setActivity(e.target.value);
+
+  // Fetch posts from backend
+  const fetchPosts = async (page) => {
+    try {
+      const response = await fetch(`http://localhost:8080/v1/posts/place-name?region=${region}&theme=${activity}&page=${page-1}&size=${postsPerPage}`);
+      const result = await response.json();
+      if (result && result.data) {
+        const { contentList, totalPages } = result.data;
+        setFilteredPosts(contentList || []);
+        setTotalPages(totalPages || 1);
+      } else {
+        console.error('Expected data object but received:', result);
+        setFilteredPosts([]);
+        setTotalPages(0);
+      }
+    } catch (error) {
+      console.error('Error during fetch posts:', error);
+      setFilteredPosts([]);
+      setTotalPages(0);
+    }
   };
 
-  const handleActivityChange = (e) => {
-    setActivity(e.target.value);
-  };
+  const fetchPostDetails = async (placeName) => {
+    try {
+      // Build query parameters
+      const query = new URLSearchParams({
+        'place-name': placeName, // Required parameter
 
-  // Filter posts based on selected values
+      }).toString();
+
+      // Log the query for debugging
+      console.log(`Fetching post details with query: ${query}`);
+
+      // Make the fetch request with query parameters
+      const response = await fetch(`http://localhost:8080/v1/posts?${query}`);
+
+      if (!response.ok) {
+        // Handle HTTP errors
+        const errorData = await response.json();
+        console.error('Server returned an error:', errorData);
+        setPostDetails(null);
+        return;
+      }
+
+      const result = await response.json();
+
+      if (result && result.data) {
+        setPostDetails(result.data);
+        setShowModal(true);
+      } else {
+        console.error('Expected data object but received:', result);
+        setPostDetails(null);
+      }
+    } catch (error) {
+      console.error('Error during fetch post details:', error);
+      setPostDetails(null);
+    }
+  };
+  useEffect(() => {
+    fetchPosts(currentPage);
+  }, [currentPage, region, activity]);
+
   const handleSearch = () => {
-    const results = posts.filter(post =>
-        (region ? post.region === region : true) &&
-        (activity ? post.activity === activity : true)
-    );
-    setFilteredPosts(results);
     setCurrentPage(1);
+    fetchPosts(1);
   };
 
-  // Get posts for the current page
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
-
-  // Handle page change
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+    fetchPosts(pageNumber);
   };
 
-  // Pagination controls
+  const handleViewDetails = (post) => {
+    // Fetch detailed information about the selected post
+    fetchPostDetails(post);
+  };
+
+  const handleCloseModal = () => setShowModal(false);
+
   const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(filteredPosts.length / postsPerPage); i++) {
+  for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
 
@@ -69,24 +108,66 @@ function Post() {
           <FloatingLabel controlId="floatingSelect" label="지역을 선택해주세요">
             <Form.Select aria-label="Floating label select example"
                          onChange={handleRegionChange}>
-              <option>지역을 선택하세요</option>
+              <option value="">지역을 선택하세요</option>
               <option value="서울">서울</option>
               <option value="대구">대구</option>
+              <option value="부산">인천</option>
+              <option value="부산">대전</option>
               <option value="부산">부산</option>
+              <option value="부산">강원</option>
+              <option value="부산">울산</option>
+              <option value="부산">경남</option>
+              <option value="부산">경북</option>
+              <option value="부산">전남</option>
+              <option value="부산">전북</option>
+              <option value="부산">제주</option>
+              <option value="부산">경기</option>
             </Form.Select>
           </FloatingLabel>
         </div>
         <div>
           <h3>어떤 것을 하고 싶으세요?</h3>
-          <FloatingLabel controlId="floatingSelect" label="지역을 선택해주세요">
+          <FloatingLabel controlId="floatingSelect" label="테마를 선택해주세요">
             <Form.Select aria-label="Floating label select example"
                          onChange={handleActivityChange}>
-              <option>지역을 선택하세요</option>
-              <option value="힐링">힐링하고 싶어요</option>
-              <option value="스릴">스릴을 즐기고 싶어요</option>
-              <option value="캠핑">캠핑하고 싶어요</option>
+              <option value="">테마를 선택하세요</option>
+              <option value="HEALING">힐링하고 싶어요</option>
+              <option value="THRILL">스릴을 즐기고 싶어요</option>
+              <option value="CAMPING">캠핑하고 싶어요</option>
+              <option value="ACTIVITIES">활동적인거 하고 싶어요</option>
+              <option value="FOOD_TOUR">먹고 싶어요</option>
+              <option value="SHOPPING">쇼핑하고 싶어요</option>
+              <option value="CULTURAL">문화생활 하고 싶어요</option>
+              <option value="MARKET">마트에 가고 싶어요</option>
+              <option value="NATURE">자연을 느끼고 싶어요</option>
+              <option value="EXPERIENCE">체험 해보고 싶어요</option>
             </Form.Select>
           </FloatingLabel>
+          {['radio'].map((type) => (
+              <div key={`inline-${type}`} className="mb-3">
+                <Form.Check
+                    inline
+                    label="최신순"
+                    name="나열방법"
+                    type={type}
+                    id={`inline-${type}-1`}
+                />
+                <Form.Check
+                    inline
+                    label="조회순"
+                    name="나열방법"
+                    type={type}
+                    id={`inline-${type}-2`}
+                />
+                <Form.Check
+                    inline
+                    label="추천순"
+                    name="나열방법"
+                    type={type}
+                    id={`inline-${type}-3`}
+                />
+              </div>
+          ))}
         </div>
         <div className="d-grid gap-2">
           <Button variant="primary" size="lg" onClick={handleSearch}>
@@ -97,11 +178,12 @@ function Post() {
           <h3>검색 결과</h3>
           {filteredPosts.length > 0 ? (
               <ListGroup as="ul" numbered>
-                {filteredPosts.map(post => (
-                    <ListGroup.Item as="li" key={post.id}>
-                      <h4>{post.region} - {post.activity}</h4>
-                      <p>{post.content}</p>
-                      <Button variant="primary">자세히 보기</Button>
+                {filteredPosts.map((post, index) => (
+                    <ListGroup.Item as="li" key={index}>
+                      <h4>{post}</h4>
+                      <Button variant="primary" onClick={() => handleViewDetails(post)}>
+                        자세히 보기
+                      </Button>
                     </ListGroup.Item>
                 ))}
               </ListGroup>
@@ -113,7 +195,7 @@ function Post() {
           <nav>
             <ul className="pagination">
               {pageNumbers.map(number => (
-                  <li key={number} className="page-item">
+                  <li key={number} className={`page-item ${number === currentPage ? 'active' : ''}`}>
                     <Button
                         className="page-link"
                         onClick={() => handlePageChange(number)}
@@ -125,6 +207,28 @@ function Post() {
             </ul>
           </nav>
         </div>
+
+        <Modal show={showModal} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Post Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {postDetails ? (
+                <div>
+                  <h4>{postDetails.title}</h4>
+                  <p>{postDetails.content}</p>
+                  {/* Add more details as needed */}
+                </div>
+            ) : (
+                <p>Loading...</p>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
   );
 }

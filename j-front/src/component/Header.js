@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap';
-
 function Header() {
+
   return (
       <Navbar expand="lg" className="bg-body-tertiary">
         <Container>
@@ -17,6 +17,7 @@ function Header() {
                   회원가입
                 </NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.3">마이페이지</NavDropdown.Item>
+                <NavDropdown.Item >로그아웃</NavDropdown.Item>
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>

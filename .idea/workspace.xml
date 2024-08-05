@@ -9,8 +9,10 @@
       <change beforePath="$PROJECT_DIR$/j-front/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Header.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/component/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/SignUp.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/SignUp.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/pages/Post.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Post.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +36,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "feat/게시판",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/spajava/RestPlaceForJFront/j-front/src/images",
+    "last_opened_file_path": "D:/spajava/RestPlaceForJ",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -71,7 +73,9 @@
       <workItem from="1722379487784" duration="11583000" />
       <workItem from="1722582709862" duration="6435000" />
       <workItem from="1722672500511" duration="616000" />
-      <workItem from="1722713323973" duration="29285000" />
+      <workItem from="1722713323973" duration="37361000" />
+      <workItem from="1722794991407" duration="5852000" />
+      <workItem from="1722815375155" duration="8261000" />
     </task>
     <servers />
   </component>

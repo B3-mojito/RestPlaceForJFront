@@ -1,20 +1,22 @@
-import Form from 'react-bootstrap/Form';
 import React, { useState } from 'react';
-import Col from 'react-bootstrap/Col';
 import PropTypes from 'prop-types';
+import Form from 'react-bootstrap/Form';
+import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate from react-router-dom
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { toast, ToastContainer } from 'react-toastify'; // Import toast and ToastContainer from react-toastify
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = ({ toggle }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();  // Create a navigate function
+  const navigate = useNavigate(); // Create a navigate function
 
   const handleSignIn = async (e) => {
-    e.preventDefault();  // Prevent default form submission behavior
+    e.preventDefault();
 
     try {
-      const response = await fetch('/v1/users/login', {
+      const response = await fetch('http://localhost:8080/v1/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,59 +25,66 @@ const Login = ({ toggle }) => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        console.log('SignIn response:', data);
+        // Log all response headers
+        console.log('Response headers:', [...response.headers]);
 
-        // Check if token exists in the response
-        if (data.token) {
+        // Get the token from the headers
+        const token = response.headers.get('Authorization');
+
+        if (token) {
+          console.log('Token found:', token);
+
           // Store the token in localStorage
-          localStorage.setItem('jwtToken', data.token);
+          localStorage.setItem('authToken', token);
 
-          // Redirect to the main screen
-          navigate('/');  // Redirect to the main screen (or wherever you want)
+          // Redirect to the home page
+          navigate('/'); // Use navigate from react-router-dom
+          toast.success('Login successful!');
         } else {
-          console.error('Token not found in response');
-          // Optionally show an error message to the user
+          console.error('Token not found in response headers');
+          toast.error('Token not found');
         }
       } else {
-        // Handle failed login
         console.error('Failed to sign in:', response.statusText);
-        // Optionally show an error message to the user
+        toast.error('Failed to sign in');
       }
     } catch (error) {
       console.error('Error during sign in:', error);
-      // Optionally show an error message to the user
+      toast.error('Error during sign in');
     }
   };
 
   return (
-      <Form onSubmit={handleSignIn}>  {/* Add onSubmit handler to the Form */}
-        <Form.Group className="mb-3" controlId="formGroupEmail">
-          <Form.Group as={Col} controlId="formEmail">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
-                type="email"
-                placeholder="Enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-            />
+      <>
+        <Form onSubmit={handleSignIn}> {/* Add onSubmit handler to the Form */}
+          <Form.Group className="mb-3" controlId="formGroupEmail">
+            <Form.Group as={Col} controlId="formEmail">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                  type="email"
+                  placeholder="Enter email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+              />
+            </Form.Group>
+            <Form.Group as={Col} controlId="formPassword">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+              />
+            </Form.Group>
           </Form.Group>
-          <Form.Group as={Col} controlId="formPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-                type="password"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
-          </Form.Group>
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          가입하기
-        </Button>
-      </Form>
+          <Button variant="primary" type="submit">
+            로그인
+          </Button>
+        </Form>
+        <ToastContainer /> {/* Add ToastContainer to your component tree */}
+      </>
   );
 };
 
