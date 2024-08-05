@@ -4,15 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="">
+    <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="init commit">
+      <change afterPath="$PROJECT_DIR$/j-front/src/pages/MyPage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/j-front/src/pages/MyPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Header.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/pages/Post.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Post.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,19 +18,33 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "geneeuchoi"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/B3-mojito/RestPlaceForJFront.git",
+    "accountId": "bfeb3961-4a16-42ca-9802-7727f065f906"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 7
 }</component>
   <component name="ProjectId" id="2jzAKo3dztHa8oB4M5zd0akHNNs" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feat/게시판",
+    "git-widget-placeholder": "feat/#3/마이페이지",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/spajava/RestPlaceForJ",
     "node.js.detected.package.eslint": "true",
@@ -81,5 +91,20 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="init commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="init commit" />
   </component>
 </project>
