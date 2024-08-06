@@ -1,0 +1,138 @@
+.my-page-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.profile-image {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-image img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.upload-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.upload-button input {
+    display: none;
+}
+
+.profile-info {
+    text-align: center;
+    margin-left: 20px;
+}
+
+.nickname {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.bio {
+    margin-bottom: 20px;
+}
+
+.profile-actions .btn {
+    margin: 0 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.plans-section, .posts-section {
+    margin-bottom: 40px;
+}
+
+.plans-section h3, .posts-section h3 {
+    margin-bottom: 20px;
+}
+
+.plan-item, .post-item {
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.add-button {
+    font-size: 24px;
+    background-color: #007bff;
+    color: white;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    margin: 0 auto;
+}
+
+.modal-profile-section {
+    display: flex;
+}
+
+.modal-profile-image {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.modal-profile-image img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.modal-profile-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-profile-info input {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
