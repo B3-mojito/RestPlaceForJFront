@@ -6,13 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Header.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/PostView.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/PostView.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/SignUp.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/SignUp.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/pages/Post.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Post.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/pages/Posting.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Posting.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +33,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "feat/게시판",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/spajava/RestPlaceForJ",
+    "last_opened_file_path": "D:/spajava/RestPlaceForJFront",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -75,7 +72,9 @@
       <workItem from="1722672500511" duration="616000" />
       <workItem from="1722713323973" duration="37361000" />
       <workItem from="1722794991407" duration="5852000" />
-      <workItem from="1722815375155" duration="8261000" />
+      <workItem from="1722815375155" duration="11902000" />
+      <workItem from="1722947623474" duration="5046000" />
+      <workItem from="1722990305372" duration="6070000" />
     </task>
     <servers />
   </component>

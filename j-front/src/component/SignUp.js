@@ -16,7 +16,7 @@ const SignUp = ({ toggle }) => {
     e.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await fetch('/v1/users', {  // Use relative URL
+      const response = await fetch('http://localhost:8080/v1/users', {  // Use relative URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

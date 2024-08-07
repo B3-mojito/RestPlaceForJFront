@@ -1,13 +1,14 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 function Posting() {
-  const [region, setRegion] = useState('');
+  const [region, setRegion] = useState('');  // 선택된 장소의 주소
   const [activity, setActivity] = useState('');
   const [content, setContent] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [placeName, setPlaceName] = useState('');  // 선택된 장소명
   const mapContainerRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -29,7 +30,6 @@ function Posting() {
 
     loadKakaoMapsScript();
 
-    // Clean up the script on component unmount
     return () => {
       const script = document.querySelector(`script[src*="dapi.kakao.com"]`);
       if (script) {
@@ -90,6 +90,7 @@ function Posting() {
       if (target.tagName === 'LI') {
         const place = JSON.parse(target.dataset.place);
         setRegion(place.address_name);
+        setPlaceName(place.place_name);
         setSearchResults([]);
 
         const marker = new window.kakao.maps.Marker({
@@ -114,17 +115,40 @@ function Posting() {
       }
     }
   }, [searchResults]);
-
+  const token = localStorage.getItem('jwtToken');
   const handleSubmit = (e) => {
     e.preventDefault();
 
     console.log({
       region,
+      placeName,
       activity,
       content
     });
 
+    fetch(`http://localhost:8080/v1/posts`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        region,
+        placeName,
+        activity,
+        content
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+
     setRegion('');
+    setPlaceName('');
     setActivity('');
     setContent('');
     setSearchResults([]);
@@ -147,10 +171,16 @@ function Posting() {
                   onChange={(e) => setActivity(e.target.value)}
                   required
               >
-                <option value="">활동을 선택하세요</option>
-                <option value="힐링">힐링하고 싶어요</option>
-                <option value="스릴">스릴을 즐기고 싶어요</option>
-                <option value="캠핑">캠핑하고 싶어요</option>
+                <option value="HEALING">힐링하고 싶어요</option>
+                <option value="THRILL">스릴을 즐기고 싶어요</option>
+                <option value="CAMPING">캠핑하고 싶어요</option>
+                <option value="ACTIVITIES">활동적인거 하고 싶어요</option>
+                <option value="FOOD_TOUR">먹고 싶어요</option>
+                <option value="SHOPPING">쇼핑하고 싶어요</option>
+                <option value="CULTURAL">문화생활 하고 싶어요</option>
+                <option value="MARKET">마트에 가고 싶어요</option>
+                <option value="NATURE">자연을 느끼고 싶어요</option>
+                <option value="EXPERIENCE">체험 해보고 싶어요</option>
               </Form.Select>
             </FloatingLabel>
           </div>
