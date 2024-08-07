@@ -16,7 +16,7 @@ function Header() {
                 <NavDropdown.Item href={"/signup"}>
                   회원가입
                 </NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">마이페이지</NavDropdown.Item>
+                <NavDropdown.Item href={"/mypage"}>마이페이지</NavDropdown.Item>
                 <NavDropdown.Item >로그아웃</NavDropdown.Item>
               </NavDropdown>
             </Nav>

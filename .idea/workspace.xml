@@ -4,12 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="">
+    <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="feat: 마이 페이지">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/component/PostView.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/PostView.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/component/SignUp.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/SignUp.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/pages/Post.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Post.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/pages/Posting.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Posting.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/MyPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/MyPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/MyPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/MyPage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,11 +21,24 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;geneeuchoi&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/B3-mojito/RestPlaceForJFront.git&quot;,
+    &quot;accountId&quot;: &quot;bfeb3961-4a16-42ca-9802-7727f065f906&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 7
 }</component>
   <component name="ProjectId" id="2jzAKo3dztHa8oB4M5zd0akHNNs" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -42,20 +57,22 @@
     "ts.external.directory.path": "D:\\IntelliJ IDEA 2024.1\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\spajava\RestPlaceForJFront\j-front\src\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/j-front/src/styles" />
+      <recent name="$PROJECT_DIR$/j-front/src/component" />
       <recent name="D:\spajava\RestPlaceForJFront\j-front\src\pages" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.18034.62" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.18034.62" />
       </set>
     </attachedChunks>
   </component>
@@ -76,9 +93,46 @@
       <workItem from="1722947623474" duration="5046000" />
       <workItem from="1722990305372" duration="6070000" />
     </task>
+    <task id="LOCAL-00001" summary="feat: 마이 페이지">
+      <option name="closed" value="true" />
+      <created>1722835447915</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1722835447915</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="feat/#3/마이페이지" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="init commit" />
+    <MESSAGE value="feat: 마이 페이지" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 마이 페이지" />
   </component>
 </project>
