@@ -5,13 +5,16 @@ import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
 
 function MyPage() {
     const [showModal, setShowModal] = useState(false);
-    const [nickname, setNickname] = useState('');
-    const [bio, setBio] = useState('');
+    const [nickname, setNickname] = useState('사용자 닉네임');
+    const [bio, setBio] = useState('한 줄 소개');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [profileImage, setProfileImage] = useState(null);
     const [profileImagePreview, setProfileImagePreview] = useState(null);
+    const [plans, setPlans] = useState([{ id: 1, title: '기존 플랜 1' }, { id: 2, title: '기존 플랜 2' }]);
+    const [isAddingPlan, setIsAddingPlan] = useState(false);
+    const [newPlanTitle, setNewPlanTitle] = useState('');
 
     const handleProfileImageChange = (e) => {
         const file = e.target.files[0];
@@ -34,6 +37,24 @@ function MyPage() {
         }
     };
 
+    const handleAddPlan = () => {
+        setIsAddingPlan(true);
+    };
+
+    const handleSaveNewPlan = () => {
+        if (newPlanTitle.trim() !== '') {
+            setPlans([...plans, { id: plans.length + 1, title: newPlanTitle }]);
+            setNewPlanTitle('');
+            setIsAddingPlan(false);
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSaveNewPlan();
+        }
+    };
+
     return (
         <div className="my-page-container">
             <div className="profile-section">
@@ -45,8 +66,8 @@ function MyPage() {
                     )}
                 </div>
                 <div className="profile-info">
-                    <h2 className="nickname">{'{nickname}'}</h2>
-                    <p className="bio">{'{bio}'}</p>
+                    <h2 className="nickname">{nickname}</h2>
+                    <p className="bio">{bio}</p>
                     <div className="profile-actions">
                         <button className="btn" onClick={() => setShowModal(true)}>프로필 수정</button>
                         <button className="btn" onClick={handleDeleteAccount}>회원 탈퇴</button>
@@ -55,9 +76,26 @@ function MyPage() {
             </div>
             <div className="plans-section">
                 <h3>나의 플랜</h3>
-                <div className="plan-item">{'{title}'}</div>
-                <div className="plan-item">{'{title}'}</div>
-                <div className="add-button">+</div>
+                {plans.map((plan) => (
+                    <div key={plan.id} className="plan-item">
+                        {plan.title}
+                    </div>
+                ))}
+                {isAddingPlan && (
+                    <div className="plan-item">
+                        <input
+                            type="text"
+                            placeholder="플랜 타이틀"
+                            value={newPlanTitle}
+                            onChange={(e) => setNewPlanTitle(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            autoFocus
+                        />
+                    </div>
+                )}
+                {!isAddingPlan && (
+                    <div className="add-button" onClick={handleAddPlan}>+</div>
+                )}
             </div>
             <div className="posts-section">
                 <h3>내가 작성한 추천 글</h3>
