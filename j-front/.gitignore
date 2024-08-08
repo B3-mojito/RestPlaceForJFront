@@ -41,7 +41,7 @@ yarn-debug.log*
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-
+.env
 # AWS User-specific
 .idea/**/aws.xml
 
