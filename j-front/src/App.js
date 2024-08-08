@@ -29,7 +29,7 @@ function App() {
                     <Route path="/signup" element={<SignUp toggle={handleToggle} />} />
                     <Route path="/post" element={<Post />} />
                     <Route path="/posting" element={<Posting />} />
-                    <Route path="/mypage" element={<MyPage />} />
+                    <Route path="/mypage" element={<MyPage toggle={handleToggle}/>} />
                 </Routes>
             </Suspense>
         </Router>

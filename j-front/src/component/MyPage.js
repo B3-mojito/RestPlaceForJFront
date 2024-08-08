@@ -1,20 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MyPage.css';
 import { Modal, Button } from 'react-bootstrap';
 import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
+import apiClient from "../utils/apiClient"; // Import the Axios instance
 
 function MyPage() {
     const [showModal, setShowModal] = useState(false);
-    const [nickname, setNickname] = useState('사용자 닉네임');
-    const [bio, setBio] = useState('한 줄 소개');
+    const [nickname, setNickname] = useState('');
+    const [bio, setBio] = useState('');
+    const [profileImage, setProfileImage] = useState(null);
+    const [profileImagePreview, setProfileImagePreview] = useState(null);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [profileImage, setProfileImage] = useState(null);
-    const [profileImagePreview, setProfileImagePreview] = useState(null);
-    const [plans, setPlans] = useState([{ id: 1, title: '기존 플랜 1' }, { id: 2, title: '기존 플랜 2' }]);
+    const [plans, setPlans] = useState([]);
+    const [posts, setPosts] = useState([]);
     const [isAddingPlan, setIsAddingPlan] = useState(false);
     const [newPlanTitle, setNewPlanTitle] = useState('');
+
+    // Fetch user profile data
+    const fetchUserProfile = async () => {
+        try {
+            const userId = 1; // Replace with actual user ID or fetch it from context
+            const response = await apiClient.get(`/users/${userId}`);
+            const { data } = response.data;
+            setNickname(data.nickname);
+            setBio(data.bio);
+            setProfileImage(data.profileImage);
+            setProfileImagePreview(data.profileImage ? `http://localhost:8080/images/${data.profileImage}` : null);
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+        }
+    };
+
+    // Fetch user plans
+    const fetchUserPlans = async () => {
+        try {
+            const userId = 2; // Replace with actual user ID or fetch it from context
+            const response = await apiClient.get('/plans', { params: { userId } });
+            const { data } = response.data;
+            setPlans(data);
+        } catch (error) {
+            console.error('Error fetching user plans:', error);
+        }
+    };
+
+    // Fetch user posts
+    const fetchUserPosts = async () => {
+        try {
+            const userId = 2; // Replace with actual user ID or fetch it from context
+            const response = await apiClient.get(`/users/${userId}/posts`);
+            const { data } = response.data;
+            setPosts(data.contentList);
+        } catch (error) {
+            console.error('Error fetching user posts:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserProfile();
+        fetchUserPlans();
+        fetchUserPosts();
+    }, []);
 
     const handleProfileImageChange = (e) => {
         const file = e.target.files[0];
@@ -23,7 +70,7 @@ function MyPage() {
     };
 
     const handleSaveChanges = () => {
-        // 여기에 저장 로직을 추가합니다.
+        // Add save logic here
         setShowModal(false);
     };
 
@@ -31,7 +78,7 @@ function MyPage() {
         const password = window.prompt('정말 탈퇴하시겠어요?\n탈퇴하려면 비밀번호를 입력하세요.');
         if (password) {
             console.log('입력된 비밀번호:', password);
-            // 여기에서 비밀번호를 확인하고 회원 탈퇴 처리 로직을 추가합니다.
+            // Add account deletion logic here
         } else {
             console.log('회원 탈퇴가 취소되었습니다.');
         }
@@ -99,8 +146,15 @@ function MyPage() {
             </div>
             <div className="posts-section">
                 <h3>내가 작성한 추천 글</h3>
-                <div className="post-item">{'{title}'}</div>
-                <div className="post-item">{'{title}'}</div>
+                {posts.length > 0 ? (
+                    posts.map((post) => (
+                        <div key={post.id} className="post-item">
+                            {post.title}
+                        </div>
+                    ))
+                ) : (
+                    <p>게시물이 없습니다.</p>
+                )}
                 <div className="add-button">+</div>
             </div>
 
