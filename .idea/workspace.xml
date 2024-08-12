@@ -5,29 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="init commit">
-      <change afterPath="$PROJECT_DIR$/j-front/src/component/Plan.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/j-front/src/component/Plan.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/j-front/src/component/PlanPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Header.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/component/MyPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/MyPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/Plan.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/PostView.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/component/SignUp.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/SignUp.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/pages/Post.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Post.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/pages/Posting.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Posting.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/utils/apiClient.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/helpers/apiClient.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/utils/authService.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/helpers/authService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j-front/src/utils/postService.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/helpers/postService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "git-widget-placeholder": "feat/게시판",
-    "node.js.selected.package.tslint": "(autodetect)"
-  }
-}]]></component>
-  <component name="TaskManager">
-    <servers />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -57,6 +54,10 @@
     &quot;accountId&quot;: &quot;bfeb3961-4a16-42ca-9802-7727f065f906&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 7
@@ -67,28 +68,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Node.js.App.js.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/#4/플랜&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/spajava/RestPlaceForJ&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Applications/IntelliJ IDEA.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Node.js.App.js.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "feat/게시판",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/spajava/RestPlaceForJ",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "D:\\IntelliJ IDEA 2024.1\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\spajava\RestPlaceForJFront\j-front\src\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\spajava\RestPlaceForJFront\j-front\src\helpers" />
       <recent name="$PROJECT_DIR$/j-front/src/styles" />
       <recent name="$PROJECT_DIR$/j-front/src/component" />
       <recent name="D:\spajava\RestPlaceForJFront\j-front\src\pages" />
@@ -97,8 +99,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.18034.62" />
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.18034.62" />
+        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
       </set>
     </attachedChunks>
   </component>
@@ -117,6 +119,7 @@
       <workItem from="1722794991407" duration="5852000" />
       <workItem from="1722815375155" duration="8261000" />
       <workItem from="1722936921907" duration="5068000" />
+      <workItem from="1723241555536" duration="34309000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 마이 페이지">
       <option name="closed" value="true" />

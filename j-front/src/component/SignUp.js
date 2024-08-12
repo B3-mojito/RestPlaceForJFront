@@ -3,8 +3,8 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import PropTypes from 'prop-types';  // Import PropTypes
-
+import PropTypes from 'prop-types';
+import {apiClient} from "../api/client";  // Import PropTypes
 const SignUp = ({ toggle }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,8 +16,7 @@ const SignUp = ({ toggle }) => {
     e.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await fetch('http://localhost:8080/v1/users', {  // Use relative URL
-        method: 'POST',
+      const response = await apiClient.post('http://localhost:8080/v1/users', {  // Use relative URL
         headers: {
           'Content-Type': 'application/json',
         },

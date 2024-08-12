@@ -9,7 +9,7 @@ function Header() {
           <Navbar.Toggle aria-controls="basic-navbar-nav"/>
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="/">계획 짜기</Nav.Link>
+              <Nav.Link href="/plan">계획 짜기</Nav.Link>
               <Nav.Link href="/post">추천 게시물 보기</Nav.Link>
               <NavDropdown title="메뉴" id="basic-nav-dropdown">
                 <NavDropdown.Item href={"/login"}>로그인</NavDropdown.Item>

@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './MyPage.css';
 import { Modal, Button } from 'react-bootstrap';
 import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
-import apiClient from "../utils/apiClient"; // Import the Axios instance
+import apiClient from "../helpers/apiClient";
 
 function MyPage() {
     const [showModal, setShowModal] = useState(false);
+    const [userId, setUserId] = useState(null);  // Store user ID
     const [nickname, setNickname] = useState('');
     const [bio, setBio] = useState('');
     const [profileImage, setProfileImage] = useState(null);
@@ -21,9 +22,13 @@ function MyPage() {
     // Fetch user profile data
     const fetchUserProfile = async () => {
         try {
-            const userId = 1; // Replace with actual user ID or fetch it from context
-            const response = await apiClient.get(`/users/${userId}`);
+            const response = await apiClient.get(`/users/myPage`, {
+                headers: {
+                    Authorization: `${localStorage.getItem('authToken')}`
+                }
+            });
             const { data } = response.data;
+            setUserId(data.id);  // Store user ID
             setNickname(data.nickname);
             setBio(data.bio);
             setProfileImage(data.profileImage);
@@ -36,8 +41,11 @@ function MyPage() {
     // Fetch user plans
     const fetchUserPlans = async () => {
         try {
-            const userId = 2; // Replace with actual user ID or fetch it from context
-            const response = await apiClient.get('/plans', { params: { userId } });
+            const response = await apiClient.get('/plans/myPlans', {
+                headers: {
+                    Authorization: `${localStorage.getItem('authToken')}`
+                }
+            });
             const { data } = response.data;
             setPlans(data);
         } catch (error) {
@@ -48,8 +56,11 @@ function MyPage() {
     // Fetch user posts
     const fetchUserPosts = async () => {
         try {
-            const userId = 2; // Replace with actual user ID or fetch it from context
-            const response = await apiClient.get(`/users/${userId}/posts`);
+            const response = await apiClient.get(`/users/myPosts`, {
+                headers: {
+                    Authorization: `${localStorage.getItem('authToken')}`
+                }
+            });
             const { data } = response.data;
             setPosts(data.contentList);
         } catch (error) {
@@ -63,10 +74,30 @@ function MyPage() {
         fetchUserPosts();
     }, []);
 
-    const handleProfileImageChange = (e) => {
+    const handleProfileImageChange = async (e) => {
         const file = e.target.files[0];
-        setProfileImage(file);
-        setProfileImagePreview(URL.createObjectURL(file));
+        if (file && userId) {  // Ensure userId is available
+            setProfileImage(file);
+            setProfileImagePreview(URL.createObjectURL(file));
+
+            try {
+                const formData = new FormData();
+                formData.append('images', file);
+
+                const response = await apiClient.post(`/users/${userId}/profile-image`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `${localStorage.getItem('authToken')}`
+                    },
+                });
+
+                const { profileImage } = response.data.data;
+                setProfileImage(profileImage);
+                setProfileImagePreview(`http://localhost:8080/images/${profileImage}`);
+            } catch (error) {
+                console.error('Error uploading profile image:', error);
+            }
+        }
     };
 
     const handleSaveChanges = () => {
@@ -179,17 +210,46 @@ function MyPage() {
                             </label>
                         </div>
                         <div className="modal-profile-info">
-                            <input type="text" placeholder="닉네임" value={nickname} onChange={(e) => setNickname(e.target.value)} />
-                            <input type="text" placeholder="한줄소개" value={bio} onChange={(e) => setBio(e.target.value)} />
-                            <input type="password" placeholder="현재 비밀번호" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
-                            <input type="password" placeholder="새로운 비밀번호" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                            <input type="password" placeholder="새로운 비밀번호 재입력" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                            <input
+                                type="text"
+                                placeholder="닉네임"
+                                value={nickname || ''} // null 대신 빈 문자열로 대체
+                                onChange={(e) => setNickname(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="한줄소개"
+                                value={bio || ''} // null 대신 빈 문자열로 대체
+                                onChange={(e) => setBio(e.target.value)}
+                            />
+                            <input
+                                type="password"
+                                placeholder="현재 비밀번호"
+                                value={currentPassword
+                                    || ''} // null 대신 빈 문자열로 대체
+                                onChange={(e) => setCurrentPassword(
+                                    e.target.value)}
+                            />
+                            <input
+                                type="password"
+                                placeholder="새로운 비밀번호"
+                                value={newPassword || ''} // null 대신 빈 문자열로 대체
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                            <input
+                                type="password"
+                                placeholder="새로운 비밀번호 재입력"
+                                value={confirmPassword
+                                    || ''} // null 대신 빈 문자열로 대체
+                                onChange={(e) => setConfirmPassword(
+                                    e.target.value)}
+                            />
                         </div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={handleSaveChanges}>
-                        <FaCheck />
+                        <FaCheck/>
                     </Button>
                 </Modal.Footer>
             </Modal>

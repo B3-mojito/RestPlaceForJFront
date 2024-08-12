@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, FloatingLabel, Form, ListGroup, Pagination } from 'react-bootstrap';
-
+import apiClient from '../helpers/apiClient';
 function PostList() {
   const [region, setRegion] = useState('');
   const [theme, setTheme] = useState('');
@@ -29,9 +29,8 @@ function PostList() {
 
   const fetchPlaces = async (page) => {
     try {
-      const response = await fetch(`http://localhost:8080/v1/posts/place-name?region=${region}&theme=${theme}&page=${page - 1}&size=${postsPerPage}`,
+      const response = await apiClient.get(`/posts/place-name?region=${region}&theme=${theme}&page=${page - 1}&size=${postsPerPage}`,
           {
-            method: 'GET',
             headers: {
               'Authorization': `${token}`, // Include the token in the Authorization header
               'Content-Type': 'application/json'
@@ -58,7 +57,7 @@ function PostList() {
   const fetchPosts = async (page, placeName, sortBy) => {
     try {
       console.log(`Fetching posts for place: ${placeName}, sort by: ${sortBy}, page: ${page}`);
-      const response = await fetch(`http://localhost:8080/v1/posts?place-name=${placeName}&sort-by=${sortBy}&page=${page - 1}&size=${postsPerPage}`,
+      const response = await apiClient.patch(`/posts?place-name=${placeName}&sort-by=${sortBy}&page=${page - 1}&size=${postsPerPage}`,
           {
             method: 'GET',
             headers: {

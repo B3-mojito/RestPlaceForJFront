@@ -1,10 +1,10 @@
-import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+import apiClient from "./apiClient";
+
 
 export const fetchPosts = async (page,region, theme) => {
   try {
-    const response = await axios.get(`${API_URL}/v1/posts/place-name`, {
+    const response = await apiClient.get(`/posts/place-name`, {
       params: {
         region: region || '',
         theme: theme || '',
