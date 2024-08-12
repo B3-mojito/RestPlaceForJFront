@@ -7,8 +7,10 @@ const apiClient = axios.create({
 
 const refreshToken = async () => {
   try {
-    const response = await axios.post('/users/reissue', {}, { withCredentials: true });
-    const newToken = response.headers['Authorization']; // Adjust based on your header name
+    console.log("토큰 재발급")
+    const response = await axios.post('http://localhost:8080/v1/users/reissue',{}, {headers:{
+        Authorization: `${localStorage.getItem('authToken')}`}});
+    const newToken = response.headers.get('Authorization'); // Adjust based on your header name
     if (newToken) {
       localStorage.setItem('authToken', newToken);
       return newToken;
@@ -16,7 +18,7 @@ const refreshToken = async () => {
   } catch (error) {
     console.error('Error refreshing token:', error);
     // Redirect to login page or handle error
-    window.location.href = '/login';
+    // window.location.href = '/login';
     return null;
   }
 };
@@ -25,6 +27,7 @@ apiClient.interceptors.request.use(
     async (config) => {
       let token = localStorage.getItem('authToken');
       if (isTokenExpired(token)) {
+        console.log("토큰만료")
         token = await refreshToken();
       }
       if (token) {
@@ -39,7 +42,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     response => response,
     async (error) => {
-      if (error.response.status === 401) {
+      if (error.response.status === 403) {
         // Token might be expired or invalid, try to refresh
         const newToken = await refreshToken();
         if (newToken) {

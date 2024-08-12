@@ -8,7 +8,7 @@ export const login = async (email, password) => {
       username: email,
       password: password
     });
-    localStorage.setItem('jwtToken', response.data);
+    localStorage.setItem('authToken', response.data);
     return response.data;
   } catch (error) {
     console.error('Login failed', error);
