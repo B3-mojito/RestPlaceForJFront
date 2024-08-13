@@ -4,35 +4,38 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import PropTypes from 'prop-types';
-import {apiClient} from "../api/client";  // Import PropTypes
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
 const SignUp = ({ toggle }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState(''); // State to hold error messages
-
+  const navigate = useNavigate();
   const handleSignUp = async (e) => {
     e.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await apiClient.post('http://localhost:8080/v1/users', {  // Use relative URL
+      // `axios.post` automatically converts the data object to JSON and sets the correct Content-Type header.
+      const response = await axios.post('http://mojito-as-lb-1-346761212.ap-northeast-2.elb.amazonaws.com/v1/users', {
+        email,
+        password,
+        name,
+        nickname
+      }, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, name, nickname }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('SignUp response:', data);
+      if (response.status === 200) {
+        console.log('SignUp response:', response.data);
         alert('회원가입 완료!');
-        toggle(); // Redirect to the sign-in page
+        navigate('/login');
       } else {
-        // Parse the error response from the backend
-        const errorData = await response.json();
-        console.error('Failed to sign up:', errorData);
-        alert(`Sign-up failed: ${errorData.message || response.statusText}`);
+        console.error('Failed to sign up:', response.data);
+        alert(`Sign-up failed: ${response.data.message || response.statusText}`);
       }
     } catch (error) {
       console.error('Error during sign up:', error);
