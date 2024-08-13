@@ -17,7 +17,7 @@ const Login = ({ toggle }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://api.restplaceforj.com/v1/users/login', {
+      const response = await fetch('http://localhost:8080/v1/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,8 +44,7 @@ const Login = ({ toggle }) => {
   };
 
   const handleKakaoLogin = () => {
-    // Kakao login logic here
-    toast.info('Kakao login clicked!');
+    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=6f65bf43b64eb76a47ee7c87702d19b2&redirect_uri=http://localhost:8080/v1/users/kakao/callback&response_type=code';
   };
 
   return (

@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="feat: about.js 수정">
-      <change afterPath="$PROJECT_DIR$/j-front/src/component/Login.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/j-front/src/component/SignUp.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/j-front/src/images/kakaoLogin.png" afterDir="false" />
+    <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="feat: 로그인, 회원가입 ui">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/component/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Login.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j-front/src/component/SignUp.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/SignUp.js" afterDir="false" />
@@ -201,7 +198,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723557032215</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="feat: 로그인, 회원가입 ui">
+      <option name="closed" value="true" />
+      <created>1723575374829</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1723575374829</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -242,6 +247,7 @@
     <MESSAGE value="fix: mixed-content bug fix - header 제거" />
     <MESSAGE value="fix: base url 수정 및 env 파일 삭제" />
     <MESSAGE value="feat: about.js 수정" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: about.js 수정" />
+    <MESSAGE value="feat: 로그인, 회원가입 ui" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 로그인, 회원가입 ui" />
   </component>
 </project>
