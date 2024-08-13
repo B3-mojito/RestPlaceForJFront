@@ -18,7 +18,7 @@ const SignUp = ({ toggle }) => {
 
     try {
       // `axios.post` automatically converts the data object to JSON and sets the correct Content-Type header.
-      const response = await axios.post('http://mojito-as-lb-1-346761212.ap-northeast-2.elb.amazonaws.com/v1/users', {
+      const response = await axios.post('https://api.restplaceforj.com/v1/users', {
         email,
         password,
         name,
