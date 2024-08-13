@@ -16,7 +16,7 @@ const Login = ({ toggle }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://mojito-as-lb-1-346761212.ap-northeast-2.elb.amazonaws.com/v1/users/login', {
+      const response = await fetch('http://localhost:8080/v1/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ import apiClient from "../helpers/apiClient";
 
 function MyPage() {
     const [showModal, setShowModal] = useState(false);
-    const [userId, setUserId] = useState(null);  // Store user ID
+    const [userId, setUserId] = useState(null);
     const [nickname, setNickname] = useState('');
     const [bio, setBio] = useState('');
     const [profileImage, setProfileImage] = useState(null);
@@ -22,13 +22,13 @@ function MyPage() {
     // Fetch user profile data
     const fetchUserProfile = async () => {
         try {
-            const response = await apiClient.get(`/users/myPage`, {
+            const response = await apiClient.get(`/users/${userId}/myPage`, {
                 headers: {
                     Authorization: `${localStorage.getItem('authToken')}`
                 }
             });
             const { data } = response.data;
-            setUserId(data.id);  // Store user ID
+            setUserId(data.id);
             setNickname(data.nickname);
             setBio(data.bio);
             setProfileImage(data.profileImage);
@@ -56,7 +56,7 @@ function MyPage() {
     // Fetch user posts
     const fetchUserPosts = async () => {
         try {
-            const response = await apiClient.get(`/users/${userId}/myPosts`, {
+            const response = await apiClient.get(`/users/myPosts`, {
                 headers: {
                     Authorization: `${localStorage.getItem('authToken')}`
                 }
@@ -76,13 +76,13 @@ function MyPage() {
 
     const handleProfileImageChange = async (e) => {
         const file = e.target.files[0];
-        if (file && userId) {  // Ensure userId is available
+        if (file && userId) {
             setProfileImage(file);
             setProfileImagePreview(URL.createObjectURL(file));
 
             try {
                 const formData = new FormData();
-                formData.append('images', file);
+                formData.append('multipartFile', file);  // Updated to match backend parameter
 
                 const response = await apiClient.post(`/users/${userId}/profile-image`, formData, {
                     headers: {
@@ -105,11 +105,27 @@ function MyPage() {
         setShowModal(false);
     };
 
-    const handleDeleteAccount = () => {
+    const handleDeleteAccount = async () => {
         const password = window.prompt('정말 탈퇴하시겠어요?\n탈퇴하려면 비밀번호를 입력하세요.');
+
         if (password) {
-            console.log('입력된 비밀번호:', password);
-            // Add account deletion logic here
+            try {
+                const response = await apiClient.delete('/users', {
+                    headers: {
+                        Authorization: `${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    data: { password }
+                });
+
+                localStorage.removeItem('authToken');
+                window.alert('계정이 성공적으로 탈퇴되었습니다.');
+                window.location.href = '/home';
+
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                window.alert('계정 탈퇴에 실패했습니다. 비밀번호를 다시 확인하세요.');
+            }
         } else {
             console.log('회원 탈퇴가 취소되었습니다.');
         }
@@ -213,36 +229,32 @@ function MyPage() {
                             <input
                                 type="text"
                                 placeholder="닉네임"
-                                value={nickname || ''} // null 대신 빈 문자열로 대체
+                                value={nickname || ''}
                                 onChange={(e) => setNickname(e.target.value)}
                             />
                             <input
                                 type="text"
                                 placeholder="한줄소개"
-                                value={bio || ''} // null 대신 빈 문자열로 대체
+                                value={bio || ''}
                                 onChange={(e) => setBio(e.target.value)}
                             />
                             <input
                                 type="password"
                                 placeholder="현재 비밀번호"
-                                value={currentPassword
-                                    || ''} // null 대신 빈 문자열로 대체
-                                onChange={(e) => setCurrentPassword(
-                                    e.target.value)}
+                                value={currentPassword || ''}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
                             />
                             <input
                                 type="password"
                                 placeholder="새로운 비밀번호"
-                                value={newPassword || ''} // null 대신 빈 문자열로 대체
+                                value={newPassword || ''}
                                 onChange={(e) => setNewPassword(e.target.value)}
                             />
                             <input
                                 type="password"
                                 placeholder="새로운 비밀번호 재입력"
-                                value={confirmPassword
-                                    || ''} // null 대신 빈 문자열로 대체
-                                onChange={(e) => setConfirmPassword(
-                                    e.target.value)}
+                                value={confirmPassword || ''}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                             />
                         </div>
                     </div>

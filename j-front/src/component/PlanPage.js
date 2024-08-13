@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import apiClient from "../helpers/apiClient";
+import { Modal, Button, Form } from 'react-bootstrap';
 
 function PlanPage() {
     const [plans, setPlans] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [newPlanTitle, setNewPlanTitle] = useState('');
-    const navigate = useNavigate(); // React Router's navigate function
+    const navigate = useNavigate();
+
     useEffect(() => {
         const fetchPlans = async () => {
             try {
                 const response = await apiClient.get('/plans/myPlans', {
                     headers: {
-                        Authorization:  localStorage.getItem('authToken')
+                        Authorization: localStorage.getItem('authToken')
                     }
-            });
+                });
                 setPlans(response.data.data);
             } catch (error) {
                 console.error('Failed to fetch plans:', error);
@@ -32,7 +34,7 @@ function PlanPage() {
                 },
                 {
                     headers: {
-                        Authorization: localStorage.getItem('authToken') // Assuming you're using JWT
+                        Authorization: localStorage.getItem('authToken')
                     }
                 });
 
@@ -45,79 +47,62 @@ function PlanPage() {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h1>나의 플랜</h1>
+        <div className="container my-4">
+            <h1 className="text-center mb-4">나의 플랜</h1>
             {plans.length > 0 ? (
-                <ul>
+                <ul className="list-group">
                     {plans.map((plan) => (
-                        <li key={plan.id} onClick={() => navigate(`/plan/${plan.id}`, { state: { plan } })}>
+                        <li
+                            key={plan.id}
+                            className="list-group-item list-group-item-action"
+                            onClick={() => navigate(`/plan/${plan.id}`, { state: { plan } })}
+                            style={{ cursor: 'pointer' }}
+                        >
                             {plan.title}
                         </li>
                     ))}
                 </ul>
             ) : (
-                <p>아직 계획이 없습니다.</p>
+                <p className="text-center">아직 계획이 없습니다.</p>
             )}
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                <button style={{
-                    backgroundColor: '#007bff',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '50px',
-                    height: '50px',
-                    color: 'white',
-                    fontSize: '24px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer'
-                }} onClick={() => setShowModal(true)}>
+
+            <div className="text-center mt-4">
+                <Button
+                    variant="primary"
+                    className="rounded-circle"
+                    style={{ width: '50px', height: '50px', fontSize: '24px', lineHeight: '30px' }}
+                    onClick={() => setShowModal(true)}
+                >
                     +
-                </button>
+                </Button>
             </div>
 
-            {showModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    backgroundColor: 'white',
-                    padding: '20px',
-                    borderRadius: '10px',
-                    boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
-                }}>
-                    <h2>새 플랜 추가</h2>
-                    <input
-                        type="text"
-                        value={newPlanTitle}
-                        onChange={(e) => setNewPlanTitle(e.target.value)}
-                        placeholder="플랜 제목을 입력하세요"
-                        style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-                    />
-                    <button onClick={handleCreatePlan} style={{
-                        backgroundColor: '#007bff',
-                        border: 'none',
-                        padding: '10px 20px',
-                        color: 'white',
-                        cursor: 'pointer',
-                        borderRadius: '5px'
-                    }}>
-                        저장
-                    </button>
-                    <button onClick={() => setShowModal(false)} style={{
-                        backgroundColor: 'gray',
-                        border: 'none',
-                        padding: '10px 20px',
-                        color: 'white',
-                        cursor: 'pointer',
-                        borderRadius: '5px',
-                        marginLeft: '10px'
-                    }}>
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>새 플랜 추가</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group>
+                            <Form.Label>플랜 제목</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newPlanTitle}
+                                onChange={(e) => setNewPlanTitle(e.target.value)}
+                                placeholder="플랜 제목을 입력하세요"
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
                         취소
-                    </button>
-                </div>
-            )}
+                    </Button>
+                    <Button variant="primary" onClick={handleCreatePlan}>
+                        저장
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }

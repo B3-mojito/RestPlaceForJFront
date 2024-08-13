@@ -3,6 +3,112 @@ import { useLocation } from 'react-router-dom';
 import apiClient from "../helpers/apiClient";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
+// Custom styles for a prettier UI
+const styles = {
+    container: {
+        padding: '20px',
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        color: '#333',
+        backgroundColor: '#f9f9f9',
+        minHeight: '100vh'
+    },
+    header: {
+        fontSize: '24px',
+        fontWeight: 'bold',
+        marginBottom: '20px',
+        color: '#3b5998',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    button: {
+        padding: '10px 20px',
+        fontSize: '14px',
+        borderRadius: '8px',
+        backgroundColor: '#3b5998',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease',
+        marginLeft: '10px',
+    },
+    buttonSecondary: {
+        padding: '10px 20px',
+        fontSize: '14px',
+        borderRadius: '8px',
+        backgroundColor: '#cccccc',
+        color: '#333',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease',
+        marginLeft: '10px',
+    },
+    input: {
+        padding: '10px',
+        borderRadius: '8px',
+        border: '1px solid #ddd',
+        marginRight: '10px',
+        width: '100%',
+        boxSizing: 'border-box'
+    },
+    mapContainer: {
+        width: '100%',
+        height: '400px',
+        marginBottom: '20px',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    },
+    columnContainer: {
+        display: 'flex',
+        gap: '20px',
+        justifyContent: 'space-around',
+        flexWrap: 'wrap'
+    },
+    column: {
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        padding: '20px',
+        width: '300px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        marginBottom: '20px'
+    },
+    card: {
+        backgroundColor: '#f7f7f7',
+        borderRadius: '8px',
+        padding: '15px',
+        marginBottom: '10px',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        cursor: 'pointer',
+        transition: 'transform 0.2s ease',
+    },
+    cardTitle: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+        marginBottom: '10px',
+    },
+    cardText: {
+        fontSize: '14px',
+        color: '#555'
+    },
+    form: {
+        marginBottom: '20px',
+        display: 'flex',
+        gap: '10px',
+        flexWrap: 'wrap',
+    },
+    formColumn: {
+        flex: '1',
+        minWidth: '200px',
+    },
+    formInput: {
+        width: '100%',
+    },
+    formButton: {
+        alignSelf: 'flex-start',
+    },
+};
+
 function Plan() {
     const location = useLocation();
     const { plan } = location.state;
@@ -38,6 +144,20 @@ function Plan() {
         if (mapsLoaded && mapContainerRef.current) {
             initializeMap();
         }
+    }, [mapsLoaded]);
+
+    useEffect(() => {
+        const searchInputElement = document.getElementById('search-input');
+        if (searchInputElement) {
+            searchInputElement.addEventListener('input', handleSearch);
+        }
+
+        return () => {
+            // Cleanup event listener on unmount
+            if (searchInputElement) {
+                searchInputElement.removeEventListener('input', handleSearch);
+            }
+        };
     }, [mapsLoaded]);
 
     const loadKakaoMapsScript = () => {
@@ -96,8 +216,6 @@ function Plan() {
                 setSearchResults([]);
             }
         };
-
-        document.getElementById('search-input').addEventListener('input', handleSearchInput);
 
         const handleMapClick = (mouseEvent) => {
             const latlng = mouseEvent.latLng;
@@ -349,69 +467,58 @@ function Plan() {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h1>
+        <div style={styles.container}>
+            <div style={styles.header}>
                 {isEditing ? (
                     <div>
                         <input
                             type="text"
                             value={planTitle}
                             onChange={(e) => setPlanTitle(e.target.value)}
-                            style={{ marginRight: '10px' }}
+                            style={styles.input}
                         />
-                        <button onClick={handleTitleChange}>Save</button>
-                        <button onClick={() => setIsEditing(false)}
-                                style={{ marginLeft: '10px' }}>Cancel
-                        </button>
+                        <button style={styles.button} onClick={handleTitleChange}>Save</button>
+                        <button style={styles.buttonSecondary} onClick={() => setIsEditing(false)}>Cancel</button>
                     </div>
                 ) : (
                     <div>
                         {planTitle}
-                        <button onClick={() => setIsEditing(true)}
-                                style={{ marginLeft: '20px' }}>Edit
-                        </button>
+                        <button style={styles.button} onClick={() => setIsEditing(true)}>Edit</button>
                     </div>
                 )}
-            </h1>
-            <div style={{ marginBottom: '20px' }}>
-                <input
-                    id="search-input"
-                    type="text"
-                    placeholder="Search for places"
-                    style={{ marginBottom: '10px' }}
-                />
-                <div ref={mapContainerRef} style={{
-                    width: '100%',
-                    height: '400px',
-                    marginBottom: '20px'
-                }}></div>
-
             </div>
-            <div style={{ marginBottom: '20px' }}>
-                <input
-                    type="text"
-                    value={newColumnTitle}
-                    onChange={(e) => setNewColumnTitle(e.target.value)}
-                    placeholder="New column title"
-                    style={{ marginRight: '10px' }}
-                />
-                <input
-                    type="date"
-                    value={newColumnDate}
-                    onChange={(e) => setNewColumnDate(e.target.value)}
-                    placeholder="Column Date"
-                    style={{ marginRight: '10px' }}
-                />
-                <button onClick={handleAddColumn}>Add Column</button>
+            <div style={styles.mapContainer} ref={mapContainerRef}></div>
+            <div style={styles.form}>
+                <div style={styles.formColumn}>
+                    <input
+                        type="text"
+                        value={newColumnTitle}
+                        onChange={(e) => setNewColumnTitle(e.target.value)}
+                        placeholder="New column title"
+                        style={{ ...styles.input, ...styles.formInput }}
+                    />
+                </div>
+                <div style={styles.formColumn}>
+                    <input
+                        type="date"
+                        value={newColumnDate}
+                        onChange={(e) => setNewColumnDate(e.target.value)}
+                        placeholder="Column Date"
+                        style={{ ...styles.input, ...styles.formInput }}
+                    />
+                </div>
+                <button style={{ ...styles.button, ...styles.formButton }} onClick={handleAddColumn}>Add Column</button>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-                <select onChange={(e) => setSelectedColumnId(e.target.value)}
-                        value={selectedColumnId || ''}>
+            <div style={styles.form}>
+                <select
+                    onChange={(e) => setSelectedColumnId(e.target.value)}
+                    value={selectedColumnId || ''}
+                    style={{ ...styles.input, ...styles.formInput }}
+                >
                     <option value="" disabled>Select column</option>
                     {columns.map((column) => (
-                        <option key={column.id}
-                                value={column.id}>{column.title}</option>
+                        <option key={column.id} value={column.id}>{column.title}</option>
                     ))}
                 </select>
                 <input
@@ -419,16 +526,16 @@ function Plan() {
                     value={newCardTitle}
                     onChange={(e) => setNewCardTitle(e.target.value)}
                     placeholder="New card title"
-                    style={{ marginRight: '10px' }}
+                    style={{ ...styles.input, ...styles.formInput }}
                 />
                 <input
                     type="text"
                     value={newCardDescription}
                     onChange={(e) => setNewCardDescription(e.target.value)}
                     placeholder="Card description"
-                    style={{ marginRight: '10px' }}
+                    style={{ ...styles.input, ...styles.formInput }}
                 />
-                <button onClick={handleAddCard}>Add Card</button>
+                <button style={{ ...styles.button, ...styles.formButton }} onClick={handleAddCard}>Add Card</button>
             </div>
 
             {editingCardId && (
@@ -440,7 +547,7 @@ function Plan() {
                         value={cardDetails.title}
                         onChange={handleCardDetailsChange}
                         placeholder="Title"
-                        style={{ marginBottom: '10px' }}
+                        style={styles.input}
                     />
                     <input
                         type="text"
@@ -448,7 +555,7 @@ function Plan() {
                         value={cardDetails.address}
                         onChange={handleCardDetailsChange}
                         placeholder="Address"
-                        style={{ marginBottom: '10px' }}
+                        style={styles.input}
                     />
                     <input
                         type="text"
@@ -456,7 +563,7 @@ function Plan() {
                         value={cardDetails.placeName}
                         onChange={handleCardDetailsChange}
                         placeholder="Place Name"
-                        style={{ marginBottom: '10px' }}
+                        style={styles.input}
                     />
                     <input
                         type="time"
@@ -464,7 +571,7 @@ function Plan() {
                         value={cardDetails.startedAt}
                         onChange={handleCardDetailsChange}
                         placeholder="Start Time"
-                        style={{ marginBottom: '10px' }}
+                        style={styles.input}
                     />
                     <input
                         type="time"
@@ -472,7 +579,7 @@ function Plan() {
                         value={cardDetails.endedAt}
                         onChange={handleCardDetailsChange}
                         placeholder="End Time"
-                        style={{ marginBottom: '10px' }}
+                        style={styles.input}
                     />
                     <input
                         type="text"
@@ -480,80 +587,58 @@ function Plan() {
                         value={cardDetails.memo}
                         onChange={handleCardDetailsChange}
                         placeholder="Memo"
-                        style={{ marginBottom: '10px' }}
+                        style={styles.input}
                     />
                     <div>
                         <input
                             type="text"
                             placeholder="Search for places"
                             onChange={handleSearchChange}
+                            style={styles.input}
                         />
                         <ul>
                             {searchResults.map((place) => (
-                                <li key={place.id}
-                                    onClick={() => handlePlaceSelect(place)}>
+                                <li key={place.id} onClick={() => handlePlaceSelect(place)}>
                                     {place.place_name} ({place.address_name})
                                 </li>
                             ))}
                         </ul>
                     </div>
-                    <button onClick={handleSaveCardChanges}>Save Changes
-                    </button>
-                    <button onClick={() => setEditingCardId(null)}>Cancel
-                    </button>
+                    <button style={styles.button} onClick={handleSaveCardChanges}>Save Changes</button>
+                    <button style={styles.buttonSecondary} onClick={() => setEditingCardId(null)}>Cancel</button>
                 </div>
             )}
 
             <DragDropContext onDragEnd={handleOnDragEnd}>
-                <div style={{ display: 'flex' }}>
+                <div style={styles.columnContainer}>
                     {columns.map(column => (
-                        <Droppable key={column.id}
-                                   droppableId={column.id.toString()}>
+                        <Droppable key={column.id} droppableId={column.id.toString()}>
                             {(provided) => (
                                 <div
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
-                                    style={{
-                                        padding: '10px',
-                                        width: '300px',
-                                        minHeight: '100px',
-                                        backgroundColor: '#f0f0f0',
-                                        margin: '10px',
-                                        borderRadius: '8px',
-                                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
-                                    }}
+                                    style={styles.column}
                                 >
                                     <h3>{column.title}</h3>
-                                    <p>Date: {column.date}</p>
+                                    <p style={{ color: '#999' }}>Date: {column.date}</p>
                                     {cards[column.id] && cards[column.id].map(
                                         (card, index) => (
-                                            <Draggable key={card.id}
-                                                       draggableId={card.id.toString()}
-                                                       index={index}>
+                                            <Draggable key={card.id} draggableId={card.id.toString()} index={index}>
                                                 {(provided) => (
                                                     <div
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
                                                         style={{
-                                                            ...provided.draggableProps.style,
-                                                            padding: '15px',
-                                                            margin: '10px 0',
-                                                            backgroundColor: '#ffffff',
-                                                            borderRadius: '8px',
-                                                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            justifyContent: 'space-between',
-                                                            cursor: 'pointer'
+                                                            ...styles.card,
+                                                            ...provided.draggableProps.style
                                                         }}
-                                                        onClick={() => handleEditCard(
-                                                            card)}
+                                                        onClick={() => handleEditCard(card)}
                                                     >
-                                                        <h4>{card.title}</h4>
-                                                        <p>Place: {card.placeName}</p>
-                                                        <p>Start: {card.startedAt}</p>
-                                                        <p>End: {card.endedAt}</p>
+                                                        <h4 style={styles.cardTitle}>{card.title}</h4>
+                                                        <p style={styles.cardText}>Place: {card.placeName}</p>
+                                                        <p style={styles.cardText}>Start: {card.startedAt}</p>
+                                                        <p style={styles.cardText}>End: {card.endedAt}</p>
                                                     </div>
                                                 )}
                                             </Draggable>
