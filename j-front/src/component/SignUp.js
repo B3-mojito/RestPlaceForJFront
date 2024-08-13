@@ -16,7 +16,7 @@ const SignUp = ({ toggle }) => {
     e.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await apiClient.post('http://localhost:8080/v1/users', {  // Use relative URL
+      const response = await apiClient.post('http://mojito-as-lb-1-346761212.ap-northeast-2.elb.amazonaws.com/v1/users', {  // Use relative URL
         headers: {
           'Content-Type': 'application/json',
         },
