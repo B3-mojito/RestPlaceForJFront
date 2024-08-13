@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { isTokenExpired } from '../utils/authUtils';
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080/v1',
+  baseURL: 'http://mojito-as-lb-1-346761212.ap-northeast-2.elb.amazonaws.com/v1',
   timeout : 1000,
 });
 
