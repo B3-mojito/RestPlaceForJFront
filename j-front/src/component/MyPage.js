@@ -22,7 +22,7 @@ function MyPage() {
     // Fetch user profile data
     const fetchUserProfile = async () => {
         try {
-            const response = await apiClient.get(`/users/${userId}/myPage`, {
+            const response = await apiClient.get(`/users/myPage`, {
                 headers: {
                     Authorization: `${localStorage.getItem('authToken')}`
                 }
@@ -32,7 +32,7 @@ function MyPage() {
             setNickname(data.nickname);
             setBio(data.bio);
             setProfileImage(data.profileImage);
-            setProfileImagePreview(data.profileImage ? `http://localhost:8080/images/${data.profileImage}` : null);
+            setProfileImagePreview(data.profileImage ? `${data.profileImage}` : null);
         } catch (error) {
             console.error('Error fetching user profile:', error);
         }
@@ -74,35 +74,37 @@ function MyPage() {
         fetchUserPosts();
     }, []);
 
-    const handleProfileImageChange = async (e) => {
+    const handleProfileImageChange = (e) => {
         const file = e.target.files[0];
-        if (file && userId) {
+        if (file) {
             setProfileImage(file);
-            setProfileImagePreview(URL.createObjectURL(file));
+            setProfileImagePreview(URL.createObjectURL(file)); // Instant preview
+        }
+    };
 
+    const handleSaveChanges = async () => {
+        if (profileImage) {
             try {
                 const formData = new FormData();
-                formData.append('multipartFile', file);  // Updated to match backend parameter
+                formData.append('images', profileImage); // Match with backend @RequestPart("images")
 
-                const response = await apiClient.post(`/users/${userId}/profile-image`, formData, {
+                const response = await apiClient.post(`/users/myPage/profile-image`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `${localStorage.getItem('authToken')}`
                     },
                 });
 
-                const { profileImage } = response.data.data;
-                setProfileImage(profileImage);
-                setProfileImagePreview(`http://localhost:8080/images/${profileImage}`);
+                const { profileImage: newProfileImage } = response.data.data;
+                setProfileImage(newProfileImage);
+                setProfileImagePreview(`http://localhost:8080/images/${newProfileImage}`);
+                setShowModal(false);
+                window.alert('프로필 이미지가 성공적으로 업데이트되었습니다.');
             } catch (error) {
                 console.error('Error uploading profile image:', error);
+                window.alert('프로필 이미지 업로드에 실패했습니다. 다시 시도해주세요.');
             }
         }
-    };
-
-    const handleSaveChanges = () => {
-        // Add save logic here
-        setShowModal(false);
     };
 
     const handleDeleteAccount = async () => {
@@ -110,6 +112,7 @@ function MyPage() {
 
         if (password) {
             try {
+                // Await the API call to ensure the frontend waits for the backend to complete
                 const response = await apiClient.delete('/users', {
                     headers: {
                         Authorization: `${localStorage.getItem('authToken')}`,
@@ -118,18 +121,31 @@ function MyPage() {
                     data: { password }
                 });
 
-                localStorage.removeItem('authToken');
-                window.alert('계정이 성공적으로 탈퇴되었습니다.');
-                window.location.href = '/home';
-
+                // Check if the status code indicates success
+                if (response.status === 200) {
+                    // Wait until backend processing is done before proceeding
+                    localStorage.removeItem('authToken');
+                    window.alert('계정이 성공적으로 탈퇴되었습니다.');
+                    // window.location.href = '/home';  // Redirect after successful deletion
+                } else {
+                    // Handle unexpected statuses
+                    console.error('Unexpected response status:', response.status);
+                    window.alert('계정 탈퇴에 실패했습니다. 다시 시도해주세요.');
+                }
             } catch (error) {
+                // Enhanced error handling to catch issues in backend processing
                 console.error('Error deleting account:', error);
-                window.alert('계정 탈퇴에 실패했습니다. 비밀번호를 다시 확인하세요.');
+                if (error.response && error.response.status === 401) {
+                    window.alert('비밀번호가 올바르지 않습니다.');
+                } else {
+                    window.alert('계정 탈퇴에 실패했습니다. 다시 시도해주세요.');
+                }
             }
         } else {
             console.log('회원 탈퇴가 취소되었습니다.');
         }
     };
+
 
     const handleAddPlan = () => {
         setIsAddingPlan(true);

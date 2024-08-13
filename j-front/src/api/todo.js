@@ -1,6 +1,6 @@
 //src/api/todo.js
 
-import { apiClient } from "./client";
+import { apiClient } from "../helpers/apiClient";
 
 export const getTodoApi = async () => {
   return apiClient.get("/posts");
