@@ -32,7 +32,7 @@ function MyPage() {
             setNickname(data.nickname);
             setBio(data.bio);
             setProfileImage(data.profileImage);
-            setProfileImagePreview(data.profileImage ? `http://localhost:8080/images/${data.profileImage}` : null);
+            setProfileImagePreview(data.profileImage ? `http://mojito-as-lb-1-346761212.ap-northeast-2.elb.amazonaws.com/images/${data.profileImage}` : null);
         } catch (error) {
             console.error('Error fetching user profile:', error);
         }
