@@ -56,7 +56,7 @@ function MyPage() {
     // Fetch user posts
     const fetchUserPosts = async () => {
         try {
-            const response = await apiClient.get(`/users/myPosts`, {
+            const response = await apiClient.get(`/users/${userId}/myPosts`, {
                 headers: {
                     Authorization: `${localStorage.getItem('authToken')}`
                 }

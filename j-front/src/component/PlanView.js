@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import apiClient from "../helpers/apiClient";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -33,60 +33,10 @@ function Plan() {
         fetchColumns();
         loadKakaoMapsScript();
     }, []);
+
     useEffect(() => {
         if (mapsLoaded && mapContainerRef.current) {
-            // Initialize Kakao Map
-            const mapContainer = mapContainerRef.current;
-            const mapOptions = {
-                center: new window.kakao.maps.LatLng(37.5665, 126.978), // Default center to Seoul
-                level: 3 // Zoom level
-            };
-
-            const map = new window.kakao.maps.Map(mapContainer, mapOptions);
-            const ps = new window.kakao.maps.services.Places();
-            const geocoder = new window.kakao.maps.services.Geocoder();
-
-            const searchPlaces = (query) => {
-                ps.keywordSearch(query, (data, status) => {
-                    if (status === window.kakao.maps.services.Status.OK) {
-                        setSearchResults(data);
-                    } else {
-                        console.error('Search failed:', status);
-                    }
-                });
-            };
-            const handleSearchInput = (e) => {
-                const query = e.target.value;
-                if (query.length > 2) {
-                    searchPlaces(query);
-                } else {
-                    setSearchResults([]);
-                }
-            };
-
-            document.getElementById('search-input').addEventListener('input', handleSearchInput);
-
-            const handleMapClick = (mouseEvent) => {
-                const latlng = mouseEvent.latLng;
-                const lat = latlng.getLat();
-                const lng = latlng.getLng();
-
-                geocoder.coord2RegionCode(lng, lat, (result, status) => {
-                    if (status === window.kakao.maps.services.Status.OK) {
-                        const place = result[0];
-                        setCardDetails(prevDetails => ({
-                            ...prevDetails,
-                            address: place.address_name,
-                            placeName: place.place_name
-                        }));
-                    } else {
-                        console.error('Failed to get address from coordinates:', status);
-                    }
-                });
-            };
-
-
-            window.kakao.maps.event.addListener(map, 'click', handleMapClick);
+            initializeMap();
         }
     }, [mapsLoaded]);
 
@@ -96,7 +46,6 @@ function Plan() {
             setMapsLoaded(true);
             return;
         }
-
 
         const existingScript = document.getElementById('kakao-maps-script');
         if (!existingScript) {
@@ -118,6 +67,59 @@ function Plan() {
         }
     };
 
+    const initializeMap = () => {
+        const mapContainer = mapContainerRef.current;
+        const mapOptions = {
+            center: new window.kakao.maps.LatLng(37.5665, 126.978),
+            level: 3
+        };
+
+        const map = new window.kakao.maps.Map(mapContainer, mapOptions);
+        const ps = new window.kakao.maps.services.Places();
+        const geocoder = new window.kakao.maps.services.Geocoder();
+
+        const searchPlaces = (query) => {
+            ps.keywordSearch(query, (data, status) => {
+                if (status === window.kakao.maps.services.Status.OK) {
+                    setSearchResults(data);
+                } else {
+                    console.error('Search failed:', status);
+                }
+            });
+        };
+
+        const handleSearchInput = (e) => {
+            const query = e.target.value;
+            if (query.length > 2) {
+                searchPlaces(query);
+            } else {
+                setSearchResults([]);
+            }
+        };
+
+        document.getElementById('search-input').addEventListener('input', handleSearchInput);
+
+        const handleMapClick = (mouseEvent) => {
+            const latlng = mouseEvent.latLng;
+            const lat = latlng.getLat();
+            const lng = latlng.getLng();
+
+            geocoder.coord2RegionCode(lng, lat, (result, status) => {
+                if (status === window.kakao.maps.services.Status.OK) {
+                    const place = result[0];
+                    setCardDetails(prevDetails => ({
+                        ...prevDetails,
+                        address: place.address_name,
+                        placeName: place.place_name
+                    }));
+                } else {
+                    console.error('Failed to get address from coordinates:', status);
+                }
+            });
+        };
+
+        window.kakao.maps.event.addListener(map, 'click', handleMapClick);
+    };
 
     const fetchPlanData = async () => {
         try {
@@ -265,7 +267,7 @@ function Plan() {
 
     const handleEditCard = (card) => {
         setEditingCardId(card.id);
-        setSelectedColumnId(card.columnId);  // Set the column ID for the card being edited
+        setSelectedColumnId(card.columnId);
         setCardDetails({
             title: card.title || '',
             address: card.address || '',
@@ -288,8 +290,8 @@ function Plan() {
         try {
             const formattedDetails = {
                 ...cardDetails,
-                startedAt: cardDetails.startedAt,  // Ensure this is in "HH:mm" format
-                endedAt: cardDetails.endedAt       // Ensure this is in "HH:mm" format
+                startedAt: cardDetails.startedAt,
+                endedAt: cardDetails.endedAt
             };
             await apiClient.patch(`/columns/${selectedColumnId}/cards/${editingCardId}`,
                 formattedDetails,
@@ -300,7 +302,7 @@ function Plan() {
                 }
             );
             setEditingCardId(null);
-            fetchColumns(); // Refresh the data
+            fetchColumns();
         } catch (error) {
             console.error('Failed to update card:', error);
         }
@@ -328,8 +330,6 @@ function Plan() {
         });
     };
 
-
-
     const handleSearchChange = (e) => {
         const query = e.target.value;
         if (query.length > 2) {
@@ -349,7 +349,7 @@ function Plan() {
     };
 
     return (
-        <div style={{padding: '20px'}}>
+        <div style={{ padding: '20px' }}>
             <h1>
                 {isEditing ? (
                     <div>
@@ -357,28 +357,28 @@ function Plan() {
                             type="text"
                             value={planTitle}
                             onChange={(e) => setPlanTitle(e.target.value)}
-                            style={{marginRight: '10px'}}
+                            style={{ marginRight: '10px' }}
                         />
                         <button onClick={handleTitleChange}>Save</button>
                         <button onClick={() => setIsEditing(false)}
-                                style={{marginLeft: '10px'}}>Cancel
+                                style={{ marginLeft: '10px' }}>Cancel
                         </button>
                     </div>
                 ) : (
                     <div>
                         {planTitle}
                         <button onClick={() => setIsEditing(true)}
-                                style={{marginLeft: '20px'}}>Edit
+                                style={{ marginLeft: '20px' }}>Edit
                         </button>
                     </div>
                 )}
             </h1>
-            <div style={{marginBottom: '20px'}}>
-                <h1
+            <div style={{ marginBottom: '20px' }}>
+                <input
                     id="search-input"
                     type="text"
                     placeholder="Search for places"
-                    style={{marginBottom: '10px', display: "none"}}
+                    style={{ marginBottom: '10px' }}
                 />
                 <div ref={mapContainerRef} style={{
                     width: '100%',
@@ -387,25 +387,25 @@ function Plan() {
                 }}></div>
 
             </div>
-            <div style={{marginBottom: '20px'}}>
+            <div style={{ marginBottom: '20px' }}>
                 <input
                     type="text"
                     value={newColumnTitle}
                     onChange={(e) => setNewColumnTitle(e.target.value)}
                     placeholder="New column title"
-                    style={{marginRight: '10px'}}
+                    style={{ marginRight: '10px' }}
                 />
                 <input
                     type="date"
                     value={newColumnDate}
                     onChange={(e) => setNewColumnDate(e.target.value)}
                     placeholder="Column Date"
-                    style={{marginRight: '10px'}}
+                    style={{ marginRight: '10px' }}
                 />
                 <button onClick={handleAddColumn}>Add Column</button>
             </div>
 
-            <div style={{marginBottom: '20px'}}>
+            <div style={{ marginBottom: '20px' }}>
                 <select onChange={(e) => setSelectedColumnId(e.target.value)}
                         value={selectedColumnId || ''}>
                     <option value="" disabled>Select column</option>
@@ -419,20 +419,20 @@ function Plan() {
                     value={newCardTitle}
                     onChange={(e) => setNewCardTitle(e.target.value)}
                     placeholder="New card title"
-                    style={{marginRight: '10px'}}
+                    style={{ marginRight: '10px' }}
                 />
                 <input
                     type="text"
                     value={newCardDescription}
                     onChange={(e) => setNewCardDescription(e.target.value)}
                     placeholder="Card description"
-                    style={{marginRight: '10px'}}
+                    style={{ marginRight: '10px' }}
                 />
                 <button onClick={handleAddCard}>Add Card</button>
             </div>
 
             {editingCardId && (
-                <div style={{marginTop: '20px'}}>
+                <div style={{ marginTop: '20px' }}>
                     <h3>Edit Card</h3>
                     <input
                         type="text"
@@ -440,7 +440,7 @@ function Plan() {
                         value={cardDetails.title}
                         onChange={handleCardDetailsChange}
                         placeholder="Title"
-                        style={{marginBottom: '10px'}}
+                        style={{ marginBottom: '10px' }}
                     />
                     <input
                         type="text"
@@ -448,7 +448,7 @@ function Plan() {
                         value={cardDetails.address}
                         onChange={handleCardDetailsChange}
                         placeholder="Address"
-                        style={{marginBottom: '10px'}}
+                        style={{ marginBottom: '10px' }}
                     />
                     <input
                         type="text"
@@ -456,7 +456,7 @@ function Plan() {
                         value={cardDetails.placeName}
                         onChange={handleCardDetailsChange}
                         placeholder="Place Name"
-                        style={{marginBottom: '10px'}}
+                        style={{ marginBottom: '10px' }}
                     />
                     <input
                         type="time"
@@ -464,7 +464,7 @@ function Plan() {
                         value={cardDetails.startedAt}
                         onChange={handleCardDetailsChange}
                         placeholder="Start Time"
-                        style={{marginBottom: '10px'}}
+                        style={{ marginBottom: '10px' }}
                     />
                     <input
                         type="time"
@@ -472,7 +472,7 @@ function Plan() {
                         value={cardDetails.endedAt}
                         onChange={handleCardDetailsChange}
                         placeholder="End Time"
-                        style={{marginBottom: '10px'}}
+                        style={{ marginBottom: '10px' }}
                     />
                     <input
                         type="text"
@@ -480,7 +480,7 @@ function Plan() {
                         value={cardDetails.memo}
                         onChange={handleCardDetailsChange}
                         placeholder="Memo"
-                        style={{marginBottom: '10px'}}
+                        style={{ marginBottom: '10px' }}
                     />
                     <div>
                         <input
@@ -505,7 +505,7 @@ function Plan() {
             )}
 
             <DragDropContext onDragEnd={handleOnDragEnd}>
-            <div style={{display: 'flex'}}>
+                <div style={{ display: 'flex' }}>
                     {columns.map(column => (
                         <Droppable key={column.id}
                                    droppableId={column.id.toString()}>
@@ -518,7 +518,9 @@ function Plan() {
                                         width: '300px',
                                         minHeight: '100px',
                                         backgroundColor: '#f0f0f0',
-                                        margin: '10px'
+                                        margin: '10px',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
                                     }}
                                 >
                                     <h3>{column.title}</h3>
@@ -535,10 +537,15 @@ function Plan() {
                                                         {...provided.dragHandleProps}
                                                         style={{
                                                             ...provided.draggableProps.style,
-                                                            padding: '10px',
-                                                            margin: '0 0 10px 0',
+                                                            padding: '15px',
+                                                            margin: '10px 0',
                                                             backgroundColor: '#ffffff',
-                                                            borderRadius: '4px'
+                                                            borderRadius: '8px',
+                                                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            justifyContent: 'space-between',
+                                                            cursor: 'pointer'
                                                         }}
                                                         onClick={() => handleEditCard(
                                                             card)}

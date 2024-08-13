@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://mojito-as-lb-1-346761212.ap-northeast-2.elb.amazonaws.com';
 
 export const login = async (email, password) => {
   try {
