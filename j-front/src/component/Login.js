@@ -3,20 +3,20 @@ import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
-import { toast, ToastContainer } from 'react-toastify'; // Import toast and ToastContainer from react-toastify
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Login = ({ toggle }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Create a navigate function
+  const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://api.restplaceforj.com/v1/users/login', {
+      const response = await fetch('http://localhost:8080/v1/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,28 +25,21 @@ const Login = ({ toggle }) => {
       });
 
       if (response.ok) {
-        // Log all response headers
-        console.log('Response headers:', [...response.headers]);
-
-        // Get the token from the headers
         const token = response.headers.get('Authorization');
-
-        if (token) {
-          console.log('Token found:', token);
-
-          // Store the token in localStorage
+        const rToken = response.headers.get('RefreshToken');
+        if (token && rToken) {
           localStorage.setItem('authToken', token);
-
-          // Redirect to the home page
-          navigate('/'); // Use navigate from react-router-dom
+          localStorage.setItem('RefreshToken', rToken);
+          navigate('/');
           toast.success('Login successful!');
         } else {
           console.error('Token not found in response headers');
           toast.error('Token not found');
         }
       } else {
-        console.error('Failed to sign in:', response.statusText);
-        toast.error('Failed to sign in');
+        const errorData = await response.json();
+        console.error('Failed to sign in:', errorData.message);
+        toast.error(`Failed to sign in: ${errorData.message}`);
       }
     } catch (error) {
       console.error('Error during sign in:', error);
@@ -56,7 +49,7 @@ const Login = ({ toggle }) => {
 
   return (
       <>
-        <Form onSubmit={handleSignIn}> {/* Add onSubmit handler to the Form */}
+        <Form onSubmit={handleSignIn}>
           <Form.Group className="mb-3" controlId="formGroupEmail">
             <Form.Group as={Col} controlId="formEmail">
               <Form.Label>Email</Form.Label>
@@ -83,7 +76,7 @@ const Login = ({ toggle }) => {
             로그인
           </Button>
         </Form>
-        <ToastContainer /> {/* Add ToastContainer to your component tree */}
+        <ToastContainer />
       </>
   );
 };

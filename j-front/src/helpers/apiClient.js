@@ -1,16 +1,16 @@
 import axios from 'axios';
 import { isTokenExpired } from '../utils/authUtils';
 const apiClient = axios.create({
-  baseURL: 'https://api.restplaceforj.com/v1',
+  baseURL: 'http://localhost:8080/v1',
   timeout : 1000,
 });
 
 const refreshToken = async () => {
   try {
     console.log("토큰 재발급")
-    const response = await axios.post('https://api.restplaceforj.com/v1/users/reissue',{}, {
+    const response = await axios.post('http://localhost:8080/v1/users/reissue',{}, {
       headers: {
-        Authorization: localStorage.getItem('authToken') // Assuming you're using JWT
+        RefreshToken: localStorage.getItem('RefreshToken') // Assuming you're using JWT
       }
     });
     const newToken = response.headers.get('Authorization'); // Adjust based on your header name
