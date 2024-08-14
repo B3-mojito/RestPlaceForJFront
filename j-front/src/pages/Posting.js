@@ -4,19 +4,17 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import apiClient from "../helpers/apiClient";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Posting() {
   const [content, setContent] = useState('');
-  const [profileImage, setProfileImage] = useState('');
+  const [title, setTitle] = useState(''); // title 상태 추가
+  const [profileImage, setProfileImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [postDetails, setPostDetails] = useState({
-    userId: '',
-    nickName: '',
-    profileImage: '',
-    title: '',
-    content: '',
     address: '',
     placeName: '',
     themeEnum: ''
@@ -27,27 +25,6 @@ function Posting() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch and decode JWT token from local storage
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        const userId = decodedToken.iss || '';
-        const nickName = decodedToken.aud || '';
-
-        // Update postDetails with userId and nickName
-        setPostDetails(prevDetails => ({
-          ...prevDetails,
-          userId,
-          nickName
-        }));
-      } catch (error) {
-        console.error('Failed to decode JWT token:', error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     loadKakaoMapsScript();
   }, []);
 
@@ -55,8 +32,8 @@ function Posting() {
     if (mapsLoaded && mapContainerRef.current) {
       const mapContainer = mapContainerRef.current;
       const mapOptions = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.978), // Default center to Seoul
-        level: 3 // Zoom level
+        center: new window.kakao.maps.LatLng(37.5665, 126.978),
+        level: 3
       };
 
       const map = new window.kakao.maps.Map(mapContainer, mapOptions);
@@ -93,15 +70,11 @@ function Posting() {
       };
 
       window.kakao.maps.event.addListener(map, 'click', handleMapClick);
-
-      return () => {
-        // Cleanup event listeners if needed
-      };
     }
   }, [mapsLoaded]);
 
   const loadKakaoMapsScript = () => {
-    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a84090a0ae739cccb8c34d58fca902b1&libraries=services,clusterer,drawing&autoload=false";
+    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=f90abf763c49b09ee81cd9b1f5f0b3ef&libraries=services,clusterer,drawing&autoload=false";
 
     if (window.kakao && window.kakao.maps) {
       setMapsLoaded(true);
@@ -128,23 +101,60 @@ function Posting() {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setProfileImage(file);
+    setPreviewImage(URL.createObjectURL(file)); // Set the preview image
+  };
+
   const handleSavePost = async (e) => {
     e.preventDefault();
 
     try {
-      const formattedDetails = {
-        ...postDetails,
-        content,
-        profileImage
+      let imageId = null;
+
+      // 이미지가 선택된 경우 업로드
+      if (profileImage) {
+        const imageData = new FormData();
+        imageData.append('images', profileImage);
+
+        const imageResponse = await apiClient.post('/images', imageData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (imageResponse.data && imageResponse.data.data) {
+          imageId = imageResponse.data.data.id; // 서버에서 반환된 이미지 ID
+        }
+      }
+
+      // 게시물 작성
+      const postPayload = {
+        title: title, // 제목 추가
+        content: content,
+        address: postDetails.address,
+        placeName: postDetails.placeName,
+        theme: postDetails.themeEnum,
+        imageIdList: imageId ? [imageId] : [] // 이미지 ID를 배열로 전달
       };
-      await apiClient.post(`/posts`, formattedDetails, {
+
+      const postResponse = await apiClient.post('/posts', postPayload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }
       });
-      navigate('/');
+
+      if (postResponse.data && postResponse.data.data) {
+        // 성공적으로 게시물 작성 후 메시지 표시
+        toast.success('게시물이 성공적으로 작성되었습니다!', {
+          onClose: () => navigate('/') // 메시지 표시 후 페이지 이동
+        });
+      }
     } catch (error) {
       console.error('Failed to create post:', error);
+      toast.error('게시물 작성에 실패했습니다.');
     }
   };
 
@@ -188,6 +198,18 @@ function Posting() {
       <div className="container">
         <h3>게시물 작성하기</h3>
         <Form onSubmit={handleSavePost}>
+          <div className="mb-3">
+            <FloatingLabel controlId="floatingTitle" label="제목을 입력하세요">
+              <Form.Control
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)} // 제목 상태 업데이트
+                  placeholder="제목을 입력하세요"
+                  required
+              />
+            </FloatingLabel>
+          </div>
+
           <div className="mb-3">
             <FloatingLabel controlId="floatingSearch">
               <div ref={mapContainerRef} style={{ height: '400px', position: 'relative' }}>
@@ -271,7 +293,8 @@ function Posting() {
           </div>
 
           <div className="mb-3">
-            <FloatingLabel controlId="floatingTextareaContent" label="게시물 내용을 입력하세요">
+            <FloatingLabel controlId="floatingTextareaContent"
+                           label="게시물 내용을 입력하세요">
               <Form.Control
                   as="textarea"
                   placeholder="게시물 내용"
@@ -284,40 +307,22 @@ function Posting() {
           </div>
 
           <div className="mb-3">
-            <FloatingLabel controlId="floatingInputProfileImage" label="Profile Image URL (Optional)">
-              <Form.Control
-                  type="text"
-                  placeholder="Profile Image URL"
-                  value={profileImage}
-                  onChange={(e) => setProfileImage(e.target.value)}
-              />
-            </FloatingLabel>
-          </div>
-
-          <div className="mb-3">
-            <FloatingLabel controlId="floatingUserId" label="User ID">
-              <Form.Control
-                  type="text"
-                  value={postDetails.userId}
-                  readOnly
-              />
-            </FloatingLabel>
-          </div>
-
-          <div className="mb-3">
-            <FloatingLabel controlId="floatingNickName" label="Nick Name">
-              <Form.Control
-                  type="text"
-                  value={postDetails.nickName}
-                  readOnly
-              />
-            </FloatingLabel>
+            <Form.Group controlId="formFile" className="mb-3">
+              <Form.Label>프로필 이미지 업로드</Form.Label>
+              <Form.Control type="file" onChange={handleImageChange} />
+            </Form.Group>
+            {previewImage && (
+                <div className="mb-3">
+                  <img src={previewImage} alt="미리보기" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
+                </div>
+            )}
           </div>
 
           <Button variant="primary" type="submit">
             게시물 작성하기
           </Button>
         </Form>
+        <ToastContainer />
       </div>
   );
 }
