@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, FloatingLabel, Form, ListGroup, Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../helpers/apiClient';
+import './PostList.css'; // Import custom CSS for additional styling
 
 function PostList() {
   const [region, setRegion] = useState('');
@@ -126,9 +127,9 @@ function PostList() {
   };
 
   return (
-      <div>
-        <div>
-          <h3>여행하시려는 지역이 어디인가요?</h3>
+      <div className="post-list-container">
+        <div className="region-selection">
+          <h3>여행하시려는 지역이 어디인가요? 😊</h3>
           <FloatingLabel controlId="floatingSelectRegion" label="지역을 선택해주세요">
             <Form.Select aria-label="Select Region" onChange={(e) => setRegion(e.target.value)}>
               <option value="">지역을 선택하세요</option>
@@ -138,7 +139,8 @@ function PostList() {
             </Form.Select>
           </FloatingLabel>
         </div>
-        <div>
+
+        <div className="theme-selection">
           <h3>어떤 것을 하고 싶으세요?</h3>
           <FloatingLabel controlId="floatingSelectTheme" label="테마를 선택해주세요">
             <Form.Select aria-label="Select Theme" onChange={(e) => setTheme(e.target.value)}>
@@ -149,19 +151,21 @@ function PostList() {
             </Form.Select>
           </FloatingLabel>
         </div>
-        <div className="d-grid gap-2 mt-3">
-          <Button variant="primary" size="lg" onClick={handleSearch}>
+
+        <div className="search-button">
+          <Button variant="success" size="lg" onClick={handleSearch} className="rounded-pill">
             찾아보기
           </Button>
         </div>
-        <div>
-          <h3>검색 결과</h3>
+
+        <div className="search-results">
+          <h3>이곳은 어떠세요?</h3>
           {places.length > 0 ? (
               <ListGroup as="ul" numbered>
                 {places.map((place, index) => (
                     <ListGroup.Item as="li" key={index}>
-                      <Button variant="link" onClick={() => handlePlaceClick(place)}>
-                        {place} {/* 검색된 장소 이름 출력 */}
+                      <Button variant="link" onClick={() => handlePlaceClick(place)} className="place-link">
+                        {place}
                       </Button>
                     </ListGroup.Item>
                 ))}
@@ -170,17 +174,19 @@ function PostList() {
               <p>조건에 맞는 게시물이 없습니다.</p>
           )}
         </div>
+
         {selectedPlace && (
-            <div>
+            <div className="place-posts">
               <h3>{selectedPlace}의 게시물</h3>
               <Form.Group controlId="sortBySelect">
                 <Form.Label>정렬 기준:</Form.Label>
-                <Form.Control as="select" value={sortBy} onChange={handleSortChange}>
+                <Form.Control as="select" value={sortBy} onChange={handleSortChange} className="sort-select">
                   <option value="createdAt">최신순</option>
                   <option value="viewsCount">조회순</option>
                   <option value="likesCount">추천순</option>
                 </Form.Control>
               </Form.Group>
+
               <h3>검색어를 입력하세요</h3>
               <Form.Group controlId="searchTitleByQ">
                 <Form.Control
@@ -188,13 +194,15 @@ function PostList() {
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="검색어를 입력하세요"
-                    onKeyPress={handleKeyPress} // 엔터 키 이벤트 추가
+                    onKeyPress={handleKeyPress}
+                    className="search-input"
                 />
               </Form.Group>
+
               <ListGroup as="ul" numbered>
                 {posts.length > 0 ? (
                     posts.map((post, index) => (
-                        <ListGroup.Item as="li" key={index} onClick={() => handlePostClick(post)}>
+                        <ListGroup.Item as="li" key={index} onClick={() => handlePostClick(post)} className="post-item">
                           <h4>{post.title}</h4>
                         </ListGroup.Item>
                     ))
@@ -202,7 +210,8 @@ function PostList() {
                     <p>게시물이 없습니다.</p>
                 )}
               </ListGroup>
-              <Pagination>
+
+              <Pagination className="pagination-container">
                 {[...Array(totalPages).keys()].map(number => (
                     <Pagination.Item key={number} active={number + 1 === currentPage} onClick={() => handlePageChange(number + 1)}>
                       {number + 1}
