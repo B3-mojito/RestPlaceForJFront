@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -6,7 +6,8 @@ import Row from 'react-bootstrap/Row';
 import PropTypes from 'prop-types';
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
-const SignUp = ({ toggle }) => {
+
+const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -35,7 +36,8 @@ const SignUp = ({ toggle }) => {
         navigate('/login');
       } else {
         console.error('Failed to sign up:', response.data);
-        alert(`Sign-up failed: ${response.data.message || response.statusText}`);
+        alert(
+            `Sign-up failed: ${response.data.message || response.statusText}`);
       }
     } catch (error) {
       console.error('Error during sign up:', error);
@@ -102,7 +104,7 @@ const SignUp = ({ toggle }) => {
 
 // Define prop types
 SignUp.propTypes = {
-toggle: PropTypes.func.isRequired,
+  toggle: PropTypes.func.isRequired,
 };
 
 export default SignUp;

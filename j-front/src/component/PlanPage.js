@@ -9,20 +9,19 @@ function PlanPage() {
     const [newPlanTitle, setNewPlanTitle] = useState('');
     const navigate = useNavigate();
 
+    const fetchPlans = async () => {
+        try {
+            const response = await apiClient.get('/plans/myPlans', {
+                headers: {
+                    Authorization: localStorage.getItem('authToken')
+                }
+            });
+            setPlans(response.data.data);
+        } catch (error) {
+            console.error('Failed to fetch plans:', error);
+        }
+    };
     useEffect(() => {
-        const fetchPlans = async () => {
-            try {
-                const response = await apiClient.get('/plans/myPlans', {
-                    headers: {
-                        Authorization: localStorage.getItem('authToken')
-                    }
-                });
-                setPlans(response.data.data);
-            } catch (error) {
-                console.error('Failed to fetch plans:', error);
-            }
-        };
-
         fetchPlans();
     }, []);
 
@@ -41,6 +40,7 @@ function PlanPage() {
             setPlans([...plans, response.data.data]);
             setShowModal(false);
             setNewPlanTitle('');
+            fetchPlans();
         } catch (error) {
             console.error('Failed to create plan:', error);
         }
