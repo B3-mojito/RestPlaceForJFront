@@ -147,6 +147,49 @@ const styles = {
     formButton: {
         alignSelf: 'flex-start',
     },
+    modal: {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#fff',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        zIndex: 1000,
+        width: '300px',
+    },
+    modalOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 999,
+    },
+    modalInput: {
+        width: '100%',
+        padding: '10px',
+        borderRadius: '4px',
+        marginBottom: '10px',
+        border: '1px solid #ddd',
+    },
+    modalButton: {
+        padding: '10px 20px',
+        borderRadius: '4px',
+        border: 'none',
+        cursor: 'pointer',
+        marginRight: '10px',
+    },
+    saveButton: {
+        backgroundColor: '#4CAF50',
+        color: 'white',
+    },
+    cancelButton: {
+        backgroundColor: '#f44336',
+        color: 'white',
+    },
 };
 
 function Plan() {
@@ -174,6 +217,48 @@ function Plan() {
     const [mapsLoaded, setMapsLoaded] = useState(false);
 
     const mapContainerRef = useRef(null);
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [editColumnData, setEditColumnData] = useState({ id: null, title: '', date: '' });
+
+    useEffect(() => {
+        fetchColumns2();
+    }, []);
+
+    const fetchColumns2 = async () => {
+        try {
+            const response = await apiClient.get(`/plans/${plan.id}/columns`, {
+                headers: {
+                    Authorization: `${localStorage.getItem('authToken')}`
+                }
+            });
+            setColumns(response.data.data);
+        } catch (error) {
+            console.error('Failed to fetch columns:', error);
+        }
+    };
+
+    const handleEditColumn = (column) => {
+        setEditColumnData({ id: column.id, title: column.title, date: column.date });
+        setEditModalVisible(true);
+    };
+
+    const handleSaveColumn = async () => {
+        try {
+            await apiClient.patch(
+                `/plans/${plan.id}/columns/${editColumnData.id}`,
+                { title: editColumnData.title, date: editColumnData.date },
+                { headers: { Authorization: `${localStorage.getItem('authToken')}` } }
+            );
+            setEditModalVisible(false);
+            fetchColumns2();
+        } catch (error) {
+            console.error('Failed to update column:', error);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditModalVisible(false);
+    };
 
     useEffect(() => {
         fetchColumns();
@@ -581,7 +666,7 @@ function Plan() {
                     <div>
                         {planTitle}
                         <button style={styles.button} onClick={() => setIsEditing(true)}>Edit</button>
-                        <button style={styles.planDeleteButton} onClick={() => deletePlan()}>delete</button>
+                        <button style={styles.planDeleteButton} onClick={deletePlan}>delete</button>
                     </div>
                 )}
             </div>
@@ -707,7 +792,38 @@ function Plan() {
                 </div>
             )}
 
-
+            {editModalVisible && (
+                <>
+                    <div style={styles.modalOverlay} onClick={handleCancelEdit}></div>
+                    <div style={styles.modal}>
+                        <input
+                            type="text"
+                            value={editColumnData.title}
+                            onChange={(e) => setEditColumnData({ ...editColumnData, title: e.target.value })}
+                            placeholder="Column Title"
+                            style={styles.modalInput}
+                        />
+                        <input
+                            type="date"
+                            value={editColumnData.date}
+                            onChange={(e) => setEditColumnData({ ...editColumnData, date: e.target.value })}
+                            style={styles.modalInput}
+                        />
+                        <button
+                            onClick={handleSaveColumn}
+                            style={{ ...styles.modalButton, ...styles.saveButton }}
+                        >
+                            Save
+                        </button>
+                        <button
+                            onClick={handleCancelEdit}
+                            style={{ ...styles.modalButton, ...styles.cancelButton }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </>
+            )}
 
             <DragDropContext onDragEnd={handleOnDragEnd}>
                 <div style={styles.columnContainer}>
@@ -720,9 +836,8 @@ function Plan() {
                                     style={styles.column}
                                 >
                                     <h3>{column.title}</h3>
-                                    <button style={styles.planDeleteButton}
-                                            onClick={() => deleteColumn(column)}>delete
-                                    </button>
+                                    <button style={styles.planDeleteButton} onClick={() => deleteColumn(column)}>delete</button>
+                                    <button style={styles.button} onClick={() => handleEditColumn(column)}>Edit</button>
                                     <p style={{color: '#999'}}>Date: {column.date}</p>
                                     {cards[column.id] && cards[column.id].map(
                                         (card, index) => (
@@ -738,8 +853,7 @@ function Plan() {
                                                             ...styles.card,
                                                             ...provided.draggableProps.style
                                                         }}
-                                                        onClick={() => handleEditCard(
-                                                            card)}
+                                                        onClick={() => handleEditCard(card)}
                                                     >
                                                         <h4 style={styles.cardTitle}>{card.title}</h4>
                                                         <button
