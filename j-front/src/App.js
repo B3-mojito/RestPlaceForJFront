@@ -7,6 +7,7 @@ import SignUp from "./component/SignUp";
 import Post from "./pages/Post";
 import Posting from "./pages/Posting";
 import MyPage from "./component/MyPage.js";
+import About from "./component/About.js";
 import ProtectedRoute from "./context/ProtectedRoute";
 import Plan from './component/PlanView';
 import PlanPage from "./component/PlanPage";
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/posts/:postId/edit" element={<EditPost />} />
                     <Route path="/posting" element={<Posting />} />
                     <Route path="/mypage" element={<MyPage toggle={handleToggle}/>} />
+                    <Route path="/about/:userId" element={<About />} />
                     <Route path="/plan" element={<PlanPage />} />
                     <Route path="/plan/:id" element={<Plan />} />
                     <Route path="/" element={<Navigate to="/home" />} />

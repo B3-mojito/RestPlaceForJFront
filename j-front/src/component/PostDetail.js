@@ -12,10 +12,9 @@ const PostDetail = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [postImage, setPostImage] = useState(null);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [modalIsOpen, setModalIsOpen] = useState(false); // State for modal
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isMapActive, setIsMapActive] = useState(true);
 
-  // 추가된 상태들
   const [plans, setPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [cards, setCards] = useState([]);
@@ -127,7 +126,7 @@ const PostDetail = () => {
   const handlePlanChange = (e) => {
     const selectedPlan = e.target.value;
     setSelectedPlanId(selectedPlan);
-    fetchCards(selectedPlan); // 선택된 플랜에 맞는 카드들을 가져옵니다.
+    fetchCards(selectedPlan);
   };
 
   const handleCardChange = (e) => {
@@ -149,7 +148,7 @@ const PostDetail = () => {
 
       if (response.data) {
         setNewComment('');
-        fetchComments();  // Refresh comments after successful submission
+        fetchComments();
       }
     } catch (error) {
       console.error('Error submitting comment:', error);
@@ -182,7 +181,7 @@ const PostDetail = () => {
             'Content-Type': 'application/json',
           },
         });
-        navigate('/'); // Redirect to the homepage after deletion
+        navigate('/');
       } catch (error) {
         console.error('Error deleting the post:', error);
       }
@@ -237,7 +236,6 @@ const PostDetail = () => {
     };
 
     if (selectedCardId) {
-      // 선택된 카드가 있는 경우
       try {
         const response = await apiClient.patch(`columns/${postId}/cards/${selectedCardId}`, {
           title: post.title,
@@ -254,13 +252,12 @@ const PostDetail = () => {
         });
 
         if (response.data) {
-          closeModal(); // 성공적으로 등록 후 모달 닫기
+          closeModal();
         }
       } catch (error) {
         console.error('Error updating card:', error);
       }
     } else {
-      // 선택된 카드가 없는 경우
       try {
         const response = await apiClient.post(`/posts/${postId}`, addCardRequestDto, {
           headers: {
@@ -270,7 +267,7 @@ const PostDetail = () => {
         });
 
         if (response.data) {
-          closeModal(); // 성공적으로 등록 후 모달 닫기
+          closeModal();
         }
       } catch (error) {
         console.error('Error adding card to plan:', error);
@@ -322,7 +319,7 @@ const PostDetail = () => {
     if (window.kakao && window.kakao.maps && address) {
       const container = document.getElementById('kakaoMap');
       const options = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.9780), // Default center if geocoding fails (Seoul)
+        center: new window.kakao.maps.LatLng(37.5665, 126.9780),
         level: 3
       };
       const map = new window.kakao.maps.Map(container, options);
@@ -353,24 +350,28 @@ const PostDetail = () => {
         <h1>{post.title}</h1>
         <div>
           {post.profileImage && (
-              <img src={post.profileImage} alt="Profile" style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '10px' }} />
+              <img
+                  src={post.profileImage}
+                  alt="Profile"
+                  style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '10px' }}
+                  onClick={() => navigate(`/about/${post.userId}`)}
+              />
           )}
-          <span>{post.nickName}</span> &middot;
+          <span onClick={() => navigate(`/about/${post.userId}`)}>{post.nickName}</span> &middot;
           <span>{post.viewsCount} views</span> &middot;
           <span>{post.likesCount} likes</span>
           <button onClick={handlePostLike} style={{ marginLeft: '10px' }}>Like</button>
           &middot;
           <span>{post.address}</span> &middot;
           <span>{post.themeEnum}</span> &middot;
-          <span>{post.placeName}</span> {/* Display the placeName */}
+          <span>{post.placeName}</span>
         </div>
 
-        {/* Conditionally render Edit and Delete buttons if the post was created by the logged-in user */}
         {loggedInUserId === post.userId && (
             <div style={{ marginTop: '10px' }}>
               <button onClick={handleEditPost} style={{ marginRight: '10px' }}>Edit</button>
               <button onClick={handleDeletePost} style={{ color: 'red', marginRight: '10px' }}>Delete</button>
-              <button onClick={openModal}>계획에 추가</button> {/* Button to open modal */}
+              <button onClick={openModal}>계획에 추가</button>
             </div>
         )}
 
@@ -391,10 +392,15 @@ const PostDetail = () => {
               comments.map((comment, index) => (
                   <div key={index} style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
                     {comment.profileImage && (
-                        <img src={comment.profileImage} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }} />
+                        <img
+                            src={comment.profileImage}
+                            alt="Profile"
+                            style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }}
+                            onClick={() => navigate(`/about/${comment.userId}`)}
+                        />
                     )}
                     <div>
-                      <strong>{comment.nickName}</strong>: {comment.content} &middot;
+                      <strong onClick={() => navigate(`/about/${comment.userId}`)}>{comment.nickName}</strong>: {comment.content} &middot;
                       <span style={{ marginLeft: '5px' }}>{comment.likesCount} likes</span>
                       <button onClick={() => handleCommentLike(comment.id)} style={{ marginLeft: '10px' }}>Like</button>
                     </div>
@@ -419,7 +425,6 @@ const PostDetail = () => {
           <button onClick={handleCommentSubmit} style={{ marginTop: '10px', padding: '10px 20px' }}>댓글 등록</button>
         </div>
 
-        {/* Modal Implementation */}
         <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
