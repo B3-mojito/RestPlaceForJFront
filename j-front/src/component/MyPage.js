@@ -3,6 +3,7 @@ import './MyPage.css';
 import { Modal, Button } from 'react-bootstrap';
 import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
 import apiClient from "../helpers/apiClient";
+import { useNavigate } from 'react-router-dom';
 
 function MyPage() {
     const [showModal, setShowModal] = useState(false);
@@ -18,6 +19,7 @@ function MyPage() {
     const [posts, setPosts] = useState([]);
     const [isAddingPlan, setIsAddingPlan] = useState(false);
     const [newPlanTitle, setNewPlanTitle] = useState('');
+    const navigate = useNavigate();
 
     // Fetch user profile data
     const fetchUserProfile = async () => {
@@ -158,6 +160,11 @@ function MyPage() {
         }
     };
 
+    const handleAddPost = () => {
+    navigate('/posting');  // 사용자를 /posting 경로로 이동시킵니다.
+  };
+
+
     return (
         <div className="my-page-container">
             <div className="profile-section">
@@ -211,7 +218,7 @@ function MyPage() {
                 ) : (
                     <p>게시물이 없습니다.</p>
                 )}
-                <div className="add-button">+</div>
+                <div className="add-button" onClick={handleAddPost}>+</div>
             </div>
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
