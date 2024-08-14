@@ -112,7 +112,6 @@ function MyPage() {
 
         if (password) {
             try {
-                // Await the API call to ensure the frontend waits for the backend to complete
                 const response = await apiClient.delete('/users', {
                     headers: {
                         Authorization: `${localStorage.getItem('authToken')}`,
@@ -121,19 +120,14 @@ function MyPage() {
                     data: { password }
                 });
 
-                // Check if the status code indicates success
                 if (response.status === 200) {
-                    // Wait until backend processing is done before proceeding
                     localStorage.removeItem('authToken');
                     window.alert('계정이 성공적으로 탈퇴되었습니다.');
-                    // window.location.href = '/home';  // Redirect after successful deletion
                 } else {
-                    // Handle unexpected statuses
                     console.error('Unexpected response status:', response.status);
                     window.alert('계정 탈퇴에 실패했습니다. 다시 시도해주세요.');
                 }
             } catch (error) {
-                // Enhanced error handling to catch issues in backend processing
                 console.error('Error deleting account:', error);
                 if (error.response && error.response.status === 401) {
                     window.alert('비밀번호가 올바르지 않습니다.');
@@ -145,7 +139,6 @@ function MyPage() {
             console.log('회원 탈퇴가 취소되었습니다.');
         }
     };
-
 
     const handleAddPlan = () => {
         setIsAddingPlan(true);
@@ -223,7 +216,7 @@ function MyPage() {
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header>
-                    <Modal.Title>프로필 수정 모달창</Modal.Title>
+                    <Modal.Title>프로필 수정</Modal.Title>
                     <Button variant="light" onClick={() => setShowModal(false)}>
                         <FaTimes />
                     </Button>
