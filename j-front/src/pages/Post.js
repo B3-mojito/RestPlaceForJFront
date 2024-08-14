@@ -85,7 +85,6 @@ function PostList() {
       setTotalPages(0);
     }
   };
-
   useEffect(() => {
     fetchPlaces(currentPage);
   }, [currentPage, region, theme]);
