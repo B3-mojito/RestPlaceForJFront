@@ -178,14 +178,16 @@ function PostList() {
         {selectedPlace && (
             <div className="place-posts">
               <h3>{selectedPlace}의 게시물</h3>
-              <Form.Group controlId="sortBySelect">
-                <Form.Label>정렬 기준:</Form.Label>
-                <Form.Control as="select" value={sortBy} onChange={handleSortChange} className="sort-select">
+              <FloatingLabel controlId="sortBySelect"
+                             label="정렬 기준을 선택해주세요">
+                <Form.Select as="select" value={sortBy}
+                              onChange={handleSortChange}
+                              className="sort-select">
                   <option value="createdAt">최신순</option>
                   <option value="viewsCount">조회순</option>
                   <option value="likesCount">추천순</option>
-                </Form.Control>
-              </Form.Group>
+                </Form.Select>
+              </FloatingLabel>
 
               <h3>검색어를 입력하세요</h3>
               <Form.Group controlId="searchTitleByQ">
@@ -202,7 +204,9 @@ function PostList() {
               <ListGroup as="ul" numbered>
                 {posts.length > 0 ? (
                     posts.map((post, index) => (
-                        <ListGroup.Item as="li" key={index} onClick={() => handlePostClick(post)} className="post-item">
+                        <ListGroup.Item as="li" key={index}
+                                        onClick={() => handlePostClick(post)}
+                                        className="post-item">
                           <h4>{post.title}</h4>
                         </ListGroup.Item>
                     ))
@@ -213,7 +217,10 @@ function PostList() {
 
               <Pagination className="pagination-container">
                 {[...Array(totalPages).keys()].map(number => (
-                    <Pagination.Item key={number} active={number + 1 === currentPage} onClick={() => handlePageChange(number + 1)}>
+                    <Pagination.Item key={number}
+                                     active={number + 1 === currentPage}
+                                     onClick={() => handlePageChange(
+                                         number + 1)}>
                       {number + 1}
                     </Pagination.Item>
                 ))}
