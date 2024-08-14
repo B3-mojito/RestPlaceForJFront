@@ -101,7 +101,7 @@ function Posting() {
   }, [mapsLoaded]);
 
   const loadKakaoMapsScript = () => {
-    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a84090a0ae739cccb8c34d58fca902b1&libraries=services,clusterer,drawing&autoload=false";
+    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=f90abf763c49b09ee81cd9b1f5f0b3ef&libraries=services,clusterer,drawing&autoload=false"
 
     if (window.kakao && window.kakao.maps) {
       setMapsLoaded(true);

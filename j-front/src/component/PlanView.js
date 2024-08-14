@@ -31,6 +31,47 @@ const styles = {
         transition: 'background-color 0.3s ease',
         marginLeft: '10px',
     },
+    // 플랜 삭제 버튼
+    planDeleteButton: {
+        padding: '10px 20px',
+        fontSize: '14px',
+        borderRadius: '8px',
+        backgroundColor: '#ff4d4f',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease',
+        marginLeft: '10px',
+    },
+    deleteButton: {
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        width: '30px',
+        height: '30px',
+        backgroundColor: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        padding: 0,
+    },
+    deleteButtonIcon: {
+        position: 'relative',
+        width: '20px',
+        height: '20px',
+    },
+    xShape: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '100%',
+        height: '2px',
+        backgroundColor: 'black',
+        transform: 'translate(-50%, -50%) rotate(45deg)',
+        content: '""',
+    },
+    xShapeAfter: {
+        transform: 'translate(-50%, -50%) rotate(-45deg)',
+    },
     buttonSecondary: {
         padding: '10px 20px',
         fontSize: '14px',
@@ -125,8 +166,8 @@ function Plan() {
         endedAt: '',
         memo: ''
     });
-    const [newColumnTitle, setNewColumnTitle] = useState('');
-    const [newCardTitle, setNewCardTitle] = useState('');
+    const [newColumnTitle, setNewColumnTitle] = useState('default');
+    const [newCardTitle, setNewCardTitle] = useState('default');
     const [newCardDescription, setNewCardDescription] = useState('');
     const [selectedColumnId, setSelectedColumnId] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -160,7 +201,7 @@ function Plan() {
     }, [mapsLoaded]);
 
     const loadKakaoMapsScript = () => {
-        const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a84090a0ae739cccb8c34d58fca902b1&libraries=services,clusterer,drawing&autoload=false";
+        const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=f90abf763c49b09ee81cd9b1f5f0b3ef&libraries=services,clusterer,drawing&autoload=false"
         if (window.kakao && window.kakao.maps) {
             setMapsLoaded(true);
             return;
@@ -307,6 +348,63 @@ function Plan() {
             setNewColumnDate('');
         } catch (error) {
             console.error('Failed to add column:', error);
+        }
+    };
+
+// 플랜 삭제 함수
+    const deletePlan = async () => {
+        // 사용자에게 경고창을 띄워 확인 요청
+        const confirmed = window.confirm("정말로 이 플랜을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+
+        // 사용자가 확인을 누른 경우에만 삭제 작업 진행
+        if (confirmed) {
+            try {
+                await apiClient.delete(`/plans/${plan.id}`);
+                console.log("플랜 삭제 완료");
+                window.location.href = '/plan'; // 홈 페이지로 리다이렉트
+            } catch (error) {
+                console.error('Error deleting plan:', error);
+            }
+        } else {
+            console.log("플랜 삭제가 취소되었습니다.");
+        }
+    };
+
+    const deleteColumn = async (column) => {
+        // 사용자에게 경고창을 띄워 확인 요청
+        const confirmed = window.confirm("정말로 이 컬럼을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+
+        // 사용자가 확인을 누른 경우에만 삭제 작업 진행
+        if (confirmed) {
+            try {
+                await apiClient.delete(`/plans/${plan.id}/columns/${column.id}`);
+                console.log("컬럼 삭제 완료");
+                fetchColumns();
+            } catch (error) {
+                console.error('Error deleting plan:', error);
+            }
+        } else {
+            console.log("컬럼 삭제가 취소되었습니다.");
+        }
+    };
+
+    // 카드 삭제 함수
+    const deleteCard = async (column, card) => {
+        // 사용자에게 경고창을 띄워 확인 요청
+        const confirmed = window.confirm("정말로 이 카드을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+
+        // 사용자가 확인을 누른 경우에만 삭제 작업 진행
+        if (confirmed) {
+            try {
+                await apiClient.delete(`/columns/${column.id}/cards/${card.id}`);
+
+                console.log("카드 삭제 완료");
+                fetchColumns();
+            } catch (error) {
+                console.error('Error deleting plan:', error);
+            }
+        } else {
+            console.log("카드 삭제가 취소되었습니다.");
         }
     };
 
@@ -483,6 +581,7 @@ function Plan() {
                     <div>
                         {planTitle}
                         <button style={styles.button} onClick={() => setIsEditing(true)}>Edit</button>
+                        <button style={styles.planDeleteButton} onClick={() => deletePlan()}>delete</button>
                     </div>
                 )}
             </div>
@@ -608,6 +707,8 @@ function Plan() {
                 </div>
             )}
 
+
+
             <DragDropContext onDragEnd={handleOnDragEnd}>
                 <div style={styles.columnContainer}>
                     {columns.map(column => (
@@ -619,10 +720,15 @@ function Plan() {
                                     style={styles.column}
                                 >
                                     <h3>{column.title}</h3>
-                                    <p style={{ color: '#999' }}>Date: {column.date}</p>
+                                    <button style={styles.planDeleteButton}
+                                            onClick={() => deleteColumn(column)}>delete
+                                    </button>
+                                    <p style={{color: '#999'}}>Date: {column.date}</p>
                                     {cards[column.id] && cards[column.id].map(
                                         (card, index) => (
-                                            <Draggable key={card.id} draggableId={card.id.toString()} index={index}>
+                                            <Draggable key={card.id}
+                                                       draggableId={card.id.toString()}
+                                                       index={index}>
                                                 {(provided) => (
                                                     <div
                                                         ref={provided.innerRef}
@@ -632,9 +738,15 @@ function Plan() {
                                                             ...styles.card,
                                                             ...provided.draggableProps.style
                                                         }}
-                                                        onClick={() => handleEditCard(card)}
+                                                        onClick={() => handleEditCard(
+                                                            card)}
                                                     >
                                                         <h4 style={styles.cardTitle}>{card.title}</h4>
+                                                        <button
+                                                            style={styles.planDeleteButton}
+                                                            onClick={() => deleteCard(column, card)}>delete
+                                                        </button>
+
                                                         <p style={styles.cardText}>Place: {card.placeName}</p>
                                                         <p style={styles.cardText}>Start: {card.startedAt}</p>
                                                         <p style={styles.cardText}>End: {card.endedAt}</p>

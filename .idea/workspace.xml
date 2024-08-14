@@ -4,23 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="init commit">
-      <change afterPath="$PROJECT_DIR$/j-front/src/component/PlanPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/Header.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/MyPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/MyPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/Plan.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/PostView.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/component/SignUp.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/component/SignUp.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/pages/Post.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Post.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/pages/Posting.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/pages/Posting.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/utils/apiClient.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/helpers/apiClient.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/utils/authService.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/helpers/authService.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j-front/src/utils/postService.js" beforeDir="false" afterPath="$PROJECT_DIR$/j-front/src/helpers/postService.js" afterDir="false" />
-    </list>
+    <list default="true" id="88acf0a8-fa80-45ec-ab57-fddf7dc4c1ab" name="Changes" comment="feat : 리플래쉬 토큰 기능 추가" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,7 +21,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feat/#3/마이페이지" />
+        <entry key="$PROJECT_DIR$" value="realDev" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -71,8 +55,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Node.js.App.js.executor": "Run",
+    "Node.js.Login.js.executor": "Debug",
+    "Node.js.apiClient.js.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feat/게시판",
+    "git-widget-placeholder": "feat/#22/토큰-재발급-시도",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/spajava/RestPlaceForJ",
     "list.type.of.created.stylesheet": "CSS",
@@ -81,7 +67,8 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "D:\\IntelliJ IDEA 2024.1\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -99,8 +86,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-WS-241.18034.50" />
       </set>
     </attachedChunks>
   </component>
@@ -120,6 +106,7 @@
       <workItem from="1722815375155" duration="8261000" />
       <workItem from="1722936921907" duration="5068000" />
       <workItem from="1723241555536" duration="34309000" />
+      <workItem from="1723546690166" duration="24029000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 마이 페이지">
       <option name="closed" value="true" />
@@ -145,7 +132,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722990926148</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="feat : 리플래쉬 토큰 기능 추가">
+      <option name="closed" value="true" />
+      <created>1723601558660</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1723601558660</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -178,6 +173,7 @@
     <MESSAGE value="feat: 마이 페이지" />
     <MESSAGE value="feat: 플랜을 추가할 수 있는 기능 추가" />
     <MESSAGE value="init commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="init commit" />
+    <MESSAGE value="feat : 리플래쉬 토큰 기능 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat : 리플래쉬 토큰 기능 추가" />
   </component>
 </project>
