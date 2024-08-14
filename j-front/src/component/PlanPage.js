@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import apiClient from "../helpers/apiClient";
 import { Modal, Button, Form } from 'react-bootstrap';
+import './PlanPage.css'; // 새로운 CSS 파일로 스타일링
 
 function PlanPage() {
     const [plans, setPlans] = useState([]);
@@ -47,34 +48,23 @@ function PlanPage() {
     };
 
     return (
-        <div className="container my-4">
-            <h1 className="text-center mb-4">나의 플랜</h1>
-            {plans.length > 0 ? (
-                <ul className="list-group">
-                    {plans.map((plan) => (
-                        <li
+        <div className="plan-page-container">
+            <h2 className="section-title">나의 플랜</h2>
+            <div className="plans-list">
+                {plans.length > 0 ? (
+                    plans.map((plan) => (
+                        <div
                             key={plan.id}
-                            className="list-group-item list-group-item-action"
+                            className="plan-item"
                             onClick={() => navigate(`/plan/${plan.id}`, { state: { plan } })}
-                            style={{ cursor: 'pointer' }}
                         >
                             {plan.title}
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p className="text-center">아직 계획이 없습니다.</p>
-            )}
-
-            <div className="text-center mt-4">
-                <Button
-                    variant="primary"
-                    className="rounded-circle"
-                    style={{ width: '50px', height: '50px', fontSize: '24px', lineHeight: '30px' }}
-                    onClick={() => setShowModal(true)}
-                >
-                    +
-                </Button>
+                        </div>
+                    ))
+                ) : (
+                    <p className="no-plans">아직 계획이 없습니다.</p>
+                )}
+                <div className="add-button" onClick={() => setShowModal(true)}>+</div>
             </div>
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
