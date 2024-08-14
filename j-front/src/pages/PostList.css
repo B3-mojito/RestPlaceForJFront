@@ -1,0 +1,70 @@
+.post-list-container {
+  padding: 20px;
+}
+
+.section {
+  margin-bottom: 60px; /* 섹션 간의 간격을 늘리기 위해 여백을 증가 */
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px; /* 섹션 타이틀 아래의 여백을 더 추가 */
+}
+
+.emoji {
+  margin-left: 8px;
+}
+
+.region-buttons,
+.theme-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.region-button,
+.theme-button {
+  border-radius: 20px;
+  font-size: 1rem;
+  padding: 10px 15px;
+  cursor: pointer; /* Ensure pointer cursor for clickable buttons */
+}
+
+.region-button.active,
+.theme-button.active {
+  background-color: #4EA685;
+  color: white;
+}
+
+.places-section {
+  margin-top: 40px;
+}
+
+.place-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.place-list-item {
+  margin-bottom: 10px;
+}
+
+.place-link {
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.posts-section {
+  margin-top: 40px;
+}
+
+.post-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
