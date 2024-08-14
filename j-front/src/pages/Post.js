@@ -39,9 +39,9 @@ function PostList() {
         }
       });
 
-      const result = response.data;
-
-      if (result && result.data && result.data.contentList) {
+      console.log(response);
+      const result =  response;
+      if (result && result.data) {
         const { contentList, totalPages } = result.data;
         setPlaces(contentList);
         setTotalPages(totalPages);
@@ -66,9 +66,9 @@ function PostList() {
         }
       });
 
-      const result = response.data;
-
-      if (result && result.data && result.data.contentList) {
+      const result = response;
+      console.log('API Response:', result); // 디버깅용 로그
+      if (result && result.data) {
         const { contentList, totalPages } = result.data;
         setPosts(contentList);
         setTotalPages(totalPages);
@@ -85,7 +85,7 @@ function PostList() {
   };
 
   useEffect(() => {
-    fetchPlaces(currentPage);
+    // fetchPlaces(currentPage);
   }, [currentPage, region, theme]);
 
   const handleSearch = () => {

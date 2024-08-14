@@ -3,7 +3,6 @@ import {useLocation} from 'react-router-dom';
 import apiClient from "../helpers/apiClient";
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 
-// Custom styles for a prettier UI
 const styles = {
   container: {
     padding: '20px',
