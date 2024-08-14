@@ -29,15 +29,20 @@ const Login = ({ toggle }) => {
         const token = response.headers.get('Authorization');
 
         if (token) {
-        const rToken = response.headers.get('RefreshToken');
-        if (token && rToken) {
-          localStorage.setItem('authToken', token);
-          localStorage.setItem('RefreshToken', rToken);
-          navigate('/');
-          toast.success('Login successful!');
+          const rToken = response.headers.get('RefreshToken');
+          if (rToken) {
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('RefreshToken', rToken);
+            navigate('/');
+            toast.success('Login successful!');
+          } else {
+            console.error('RefreshToken not found in response headers');
+            toast.error('Token not found');
+          }
         } else {
-          console.error('Token not found in response headers');
-          toast.error('Token not found');
+          const errorData = await response.json();
+          console.error('Failed to sign in:', errorData.message);
+          toast.error(`Failed to sign in: ${errorData.message}`);
         }
       } else {
         const errorData = await response.json();
