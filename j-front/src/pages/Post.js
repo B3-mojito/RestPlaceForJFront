@@ -15,6 +15,7 @@ function PostList() {
   const postsPerPage = 10;
   const token = localStorage.getItem('authToken');
   const navigate = useNavigate();
+  const [q, setQ] = useState('');
 
   const regions = ["서울", "경기", "인천", "대전", "대구", "부산", "울산", "경남", "경북", "강원", "충남", "전남", "제주"];
   const themes = [
@@ -59,7 +60,7 @@ function PostList() {
 
   const fetchPosts = async (page, placeName, sortBy) => {
     try {
-      const response = await apiClient.get(`/posts?place-name=${placeName}&sort-by=${sortBy}&page=${page - 1}&size=${postsPerPage}`, {
+      const response = await apiClient.get(`/posts?place-name=${placeName}&sort-by=${sortBy}&page=${page - 1}&size=${postsPerPage}&q=${q}`, {
         headers: {
           'Authorization': `${token}`,
           'Content-Type': 'application/json'
@@ -110,13 +111,18 @@ function PostList() {
 
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
-    if (selectedPlace) {
-      fetchPosts(1, selectedPlace, e.target.value);
-    }
   };
 
   const handlePostClick = (post) => {
     navigate(`/posts/${post.id}`);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setCurrentPage(1);
+      fetchPosts(1, selectedPlace, sortBy);
+    }
   };
 
   return (
@@ -175,6 +181,16 @@ function PostList() {
                   <option value="likesCount">추천순</option>
                 </Form.Control>
               </Form.Group>
+              <h3>검색어를 입력하세요</h3>
+              <Form.Group controlId="searchTitleByQ">
+                <Form.Control
+                    type="text"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="검색어를 입력하세요"
+                    onKeyPress={handleKeyPress} // 엔터 키 이벤트 추가
+                />
+              </Form.Group>
               <ListGroup as="ul" numbered>
                 {posts.length > 0 ? (
                     posts.map((post, index) => (
@@ -200,4 +216,3 @@ function PostList() {
 }
 
 export default PostList;
-

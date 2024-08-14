@@ -17,7 +17,7 @@ function Posting() {
   const [postDetails, setPostDetails] = useState({
     address: '',
     placeName: '',
-    themeEnum: ''
+    themeEnum: 'HEALING'
   });
   const [mapsLoaded, setMapsLoaded] = useState(false);
 
