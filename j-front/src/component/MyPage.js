@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './MyPage.css';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Form } from 'react-bootstrap';
 import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
 import apiClient from "../helpers/apiClient";
 import { useNavigate } from 'react-router-dom';
 
 function MyPage() {
-    const [showModal, setShowModal] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const [showPlanModal, setShowPlanModal] = useState(false);
     const [userId, setUserId] = useState(null);
     const [nickname, setNickname] = useState('');
     const [bio, setBio] = useState('');
@@ -20,6 +21,43 @@ function MyPage() {
     const [isAddingPlan, setIsAddingPlan] = useState(false);
     const [newPlanTitle, setNewPlanTitle] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const response = await apiClient.get('/plans/myPlans', {
+                    headers: {
+                        Authorization: localStorage.getItem('authToken')
+                    }
+                });
+                setPlans(response.data.data);
+            } catch (error) {
+                console.error('Failed to fetch plans:', error);
+            }
+        };
+
+        fetchPlans();
+    }, []);
+
+    const handleCreatePlan = async () => {
+        try {
+            const response = await apiClient.post('/plans',
+                {
+                    title: newPlanTitle
+                },
+                {
+                    headers: {
+                        Authorization: localStorage.getItem('authToken')
+                    }
+                });
+
+            setPlans([...plans, response.data.data]);
+            setShowPlanModal(false);
+            setNewPlanTitle('');
+        } catch (error) {
+            console.error('Failed to create plan:', error);
+        }
+    };
 
     // Fetch user profile data
     const fetchUserProfile = async () => {
@@ -100,7 +138,7 @@ function MyPage() {
                 const { profileImage: newProfileImage } = response.data.data;
                 setProfileImage(newProfileImage);
                 setProfileImagePreview(`http://localhost:8080/images/${newProfileImage}`);
-                setShowModal(false);
+                setShowProfileModal(false);
                 window.alert('프로필 이미지가 성공적으로 업데이트되었습니다.');
             } catch (error) {
                 console.error('Error uploading profile image:', error);
@@ -142,35 +180,16 @@ function MyPage() {
         }
     };
 
-    const handleAddPlan = () => {
-        setIsAddingPlan(true);
-    };
-
-    const handleSaveNewPlan = () => {
-        if (newPlanTitle.trim() !== '') {
-            setPlans([...plans, { id: plans.length + 1, title: newPlanTitle }]);
-            setNewPlanTitle('');
-            setIsAddingPlan(false);
-        }
-    };
-
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            handleSaveNewPlan();
-        }
-    };
-
     const handleAddPost = () => {
-    navigate('/posting');  // 사용자를 /posting 경로로 이동시킵니다.
-  };
-
+        navigate('/posting');  // 사용자를 /posting 경로로 이동시킵니다.
+    };
 
     return (
         <div className="my-page-container">
             <div className="profile-section">
                 <div className="profile-image">
                     {profileImagePreview ? (
-                        <img src={profileImagePreview} alt="Profile" />
+                        <img src={profileImagePreview} alt="Profile"/>
                     ) : (
                         <div>{'{path}'}</div>
                     )}
@@ -179,34 +198,63 @@ function MyPage() {
                     <h2 className="nickname">{nickname}</h2>
                     <p className="bio">{bio}</p>
                     <div className="profile-actions">
-                        <button className="btn" onClick={() => setShowModal(true)}>프로필 수정</button>
+                        <button className="btn"
+                                onClick={() => setShowProfileModal(true)}>프로필 수정
+                        </button>
                         <button className="btn" onClick={handleDeleteAccount}>회원 탈퇴</button>
                     </div>
                 </div>
             </div>
+
             <div className="plans-section">
                 <h3>나의 플랜</h3>
-                {plans.map((plan) => (
-                    <div key={plan.id} className="plan-item">
-                        {plan.title}
+                <div className="plans-list">
+                    {plans.length > 0 ? (
+                        plans.map((plan) => (
+                            <div
+                                key={plan.id}
+                                className="plan-item"
+                                onClick={() => navigate(`/plan/${plan.id}`, { state: { plan } })}
+                            >
+                                {plan.title}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="no-plans">아직 계획이 없습니다.</p>
+                    )}
+                    <div className="add-button"
+                         onClick={() => setShowPlanModal(true)}>+
                     </div>
-                ))}
-                {isAddingPlan && (
-                    <div className="plan-item">
-                        <input
-                            type="text"
-                            placeholder="플랜 타이틀"
-                            value={newPlanTitle}
-                            onChange={(e) => setNewPlanTitle(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            autoFocus
-                        />
-                    </div>
-                )}
-                {!isAddingPlan && (
-                    <div className="add-button" onClick={handleAddPlan}>+</div>
-                )}
+                </div>
+
+                <Modal show={showPlanModal} onHide={() => setShowPlanModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>새 플랜 추가</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group>
+                                <Form.Label>플랜 제목</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={newPlanTitle}
+                                    onChange={(e) => setNewPlanTitle(e.target.value)}
+                                    placeholder="플랜 제목을 입력하세요"
+                                />
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowPlanModal(false)}>
+                            취소
+                        </Button>
+                        <Button variant="primary" onClick={handleCreatePlan}>
+                            저장
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
+
             <div className="posts-section">
                 <h3>내가 작성한 추천 글</h3>
                 {posts.length > 0 ? (
@@ -221,24 +269,26 @@ function MyPage() {
                 <div className="add-button" onClick={handleAddPost}>+</div>
             </div>
 
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)}>
                 <Modal.Header>
                     <Modal.Title>프로필 수정</Modal.Title>
-                    <Button variant="light" onClick={() => setShowModal(false)}>
-                        <FaTimes />
+                    <Button variant="light" onClick={() => setShowProfileModal(false)}>
+                        <FaTimes/>
                     </Button>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="modal-profile-section">
                         <div className="modal-profile-image">
                             {profileImagePreview ? (
-                                <img src={profileImagePreview} alt="Profile" />
+                                <img src={profileImagePreview} alt="Profile"/>
                             ) : (
                                 <div>{'{path}'}</div>
                             )}
                             <label className="upload-button">
-                                <FaPlus />
-                                <input type="file" accept="image/*" onChange={handleProfileImageChange} style={{ display: 'none' }} />
+                                <FaPlus/>
+                                <input type="file" accept="image/*"
+                                       onChange={handleProfileImageChange}
+                                       style={{display: 'none'}}/>
                             </label>
                         </div>
                         <div className="modal-profile-info">
