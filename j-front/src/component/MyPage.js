@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './MyPage.css';
-import { Modal, Button, Form } from 'react-bootstrap';
+import {Modal, Button, Form, ListGroup} from 'react-bootstrap';
 import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
 import apiClient from "../helpers/apiClient";
 import { useNavigate } from 'react-router-dom';
@@ -184,6 +184,11 @@ function MyPage() {
         navigate('/posting');  // 사용자를 /posting 경로로 이동시킵니다.
     };
 
+    const handlePostClick = (post) => {
+        navigate(`/posts/${post.id}`);
+    };
+
+
     return (
         <div className="my-page-container">
             <div className="profile-section">
@@ -259,7 +264,12 @@ function MyPage() {
                 <h3>내가 작성한 추천 글</h3>
                 {posts.length > 0 ? (
                     posts.map((post) => (
-                        <div key={post.id} className="post-item">
+                        <div
+                            key={post.id}
+                            className="post-item"
+                            onClick={() => handlePostClick(
+                                post)} // Added onClick event
+                        >
                             {post.title}
                         </div>
                     ))
@@ -269,16 +279,19 @@ function MyPage() {
                 <div className="add-button" onClick={handleAddPost}>+</div>
             </div>
 
-            <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)}>
+
+            <Modal show={showProfileModal}
+                   onHide={() => setShowProfileModal(false)}>
                 <Modal.Header>
                     <Modal.Title>프로필 수정</Modal.Title>
-                    <Button variant="light" onClick={() => setShowProfileModal(false)}>
+                    <Button variant="light"
+                            onClick={() => setShowProfileModal(false)}>
                         <FaTimes/>
                     </Button>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="modal-profile-section">
-                        <div className="modal-profile-image">
+                    <div className="modal-profile-image">
                             {profileImagePreview ? (
                                 <img src={profileImagePreview} alt="Profile"/>
                             ) : (
