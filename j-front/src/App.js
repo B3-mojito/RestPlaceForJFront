@@ -14,6 +14,7 @@ import PlanPage from "./component/PlanPage";
 import PostDetail from "./component/PostDetail";
 import EditPost from "./component/EidtPost";
 import Footer from './component/Footer';
+import LoginHandler from "./component/KakaoRedirect";
 
 const Login = lazy(() => import('./component/Login'));
 const Home = lazy(() => import('./pages/Home'));
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/plan" element={<PlanPage />} />
                     <Route path="/plan/:id" element={<Plan />} />
                     <Route path="/" element={<Navigate to="/home" />} />
+                    <Route path="/oauth/kakao/callback" element={<LoginHandler />} />
                 </Routes>
             </Suspense>
             <Footer />
