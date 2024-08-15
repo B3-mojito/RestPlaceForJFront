@@ -40,7 +40,7 @@ const PostDetail = () => {
     try {
       const response = await apiClient.get('/users/me', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json',
         },
       });
@@ -54,7 +54,7 @@ const PostDetail = () => {
     try {
       const response = await apiClient.get(`/posts/${postId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json',
         },withCredentials : true,
       });
@@ -68,7 +68,7 @@ const PostDetail = () => {
     try {
       const response = await apiClient.get(`/images/${postId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json',
         },
       });
@@ -82,7 +82,7 @@ const PostDetail = () => {
     try {
       const response = await apiClient.get('/plans/myPlans', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json',
         },
       });
@@ -96,7 +96,7 @@ const PostDetail = () => {
     try {
       const response = await apiClient.get(`/plans/${planId}/cards`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json',
         },
       });
@@ -112,7 +112,7 @@ const PostDetail = () => {
           `/posts/${postId}/comments?page=${currentPage}&size=5`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              Authorization: `${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json',
             },
           }
@@ -147,7 +147,7 @@ const PostDetail = () => {
           { content: newComment },
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              Authorization: `${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json',
             },
           }
@@ -186,7 +186,7 @@ const PostDetail = () => {
       try {
         await apiClient.delete(`/posts/${postId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            Authorization: `${localStorage.getItem('authToken')}`,
             'Content-Type': 'application/json',
           },
         });
@@ -204,7 +204,7 @@ const PostDetail = () => {
           {},
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              Authorization: `${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json',
             },
           }
@@ -225,7 +225,7 @@ const PostDetail = () => {
           {},
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              Authorization: `${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json',
             },
           }
@@ -254,9 +254,10 @@ const PostDetail = () => {
 
     if (selectedCardId) {
       try {
-        const response = await apiClient.patch(
-            `columns/${postId}/cards/${selectedCardId}`,
+        const response = await apiClient.post(
+            `/posts/${postId}`,
             {
+              cardId : selectedCardId,
               title: post.title,
               address: post.address,
               placeName: post.placeName,
@@ -266,7 +267,7 @@ const PostDetail = () => {
             },
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+                Authorization: `${localStorage.getItem('authToken')}`,
                 'Content-Type': 'application/json',
               },
             }
@@ -285,7 +286,7 @@ const PostDetail = () => {
             addCardRequestDto,
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+                Authorization: `${localStorage.getItem('authToken')}`,
                 'Content-Type': 'application/json',
               },
             }
@@ -312,7 +313,7 @@ const PostDetail = () => {
           { content: editCommentContent },
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              Authorization: `${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json',
             },
           }
@@ -336,7 +337,7 @@ const PostDetail = () => {
       try {
         await apiClient.delete(`/posts/${postId}/comments/${commentId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            Authorization: `${localStorage.getItem('authToken')}`,
             'Content-Type': 'application/json',
           },
         });

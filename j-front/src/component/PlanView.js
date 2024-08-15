@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import apiClient from "../helpers/apiClient";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -31,7 +31,6 @@ const styles = {
         transition: 'background-color 0.3s ease',
         marginLeft: '10px',
     },
-    // 플랜 삭제 버튼
     planDeleteButton: {
         padding: '10px 20px',
         fontSize: '14px',
@@ -43,34 +42,23 @@ const styles = {
         transition: 'background-color 0.3s ease',
         marginLeft: '10px',
     },
-    deleteButton: {
-        position: 'absolute',
-        top: '10px',
-        right: '10px',
-        width: '30px',
-        height: '30px',
-        backgroundColor: 'transparent',
+    profileImage: {
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%',
+        marginLeft: '10px',
+        cursor: 'pointer',
+    },
+    inviteButton: {
+        padding: '10px 20px',
+        fontSize: '14px',
+        borderRadius: '8px',
+        backgroundColor: '#3b5998',
+        color: '#fff',
         border: 'none',
         cursor: 'pointer',
-        padding: 0,
-    },
-    deleteButtonIcon: {
-        position: 'relative',
-        width: '20px',
-        height: '20px',
-    },
-    xShape: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        width: '100%',
-        height: '2px',
-        backgroundColor: 'black',
-        transform: 'translate(-50%, -50%) rotate(45deg)',
-        content: '""',
-    },
-    xShapeAfter: {
-        transform: 'translate(-50%, -50%) rotate(-45deg)',
+        transition: 'background-color 0.3s ease',
+        marginLeft: '10px',
     },
     buttonSecondary: {
         padding: '10px 20px',
@@ -215,7 +203,10 @@ function Plan() {
     const [selectedColumnId, setSelectedColumnId] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [mapsLoaded, setMapsLoaded] = useState(false);
-    const [relatedPosts, setRelatedPosts] = useState({});
+    const [relatedPosts, setRelatedPosts] = useState([]);
+    const [coworkers, setCoworkers] = useState([]);
+    const [inviteModalIsOpen, setInviteModalIsOpen] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
 
     const mapContainerRef = useRef(null);
     const [editModalVisible, setEditModalVisible] = useState(false);
@@ -224,6 +215,7 @@ function Plan() {
 
     useEffect(() => {
         fetchColumns2();
+        fetchCoworkers();
     }, []);
 
     const fetchColumns2 = async () => {
@@ -236,6 +228,19 @@ function Plan() {
             setColumns(response.data.data);
         } catch (error) {
             console.error('Failed to fetch columns:', error);
+        }
+    };
+
+    const fetchCoworkers = async () => {
+        try {
+            const response = await apiClient.get(`/plans/${plan.id}/images`, {
+                headers: {
+                    Authorization: `${localStorage.getItem('authToken')}`
+                }
+            });
+            setCoworkers(response.data.data);
+        } catch (error) {
+            console.error('Failed to fetch coworkers:', error);
         }
     };
 
@@ -663,27 +668,67 @@ function Plan() {
         navigate(`/posts/${postId}`);
     };
 
+    const openInviteModal = () => {
+        setInviteModalIsOpen(true);
+    };
+
+    const closeInviteModal = () => {
+        setInviteModalIsOpen(false);
+    };
+
+    const handleInviteEmailChange = (e) => {
+        setInviteEmail(e.target.value);
+    };
+
+    const handleInviteSubmit = async () => {
+        try {
+            await apiClient.post(`/plans/${plan.id}/invite`, { email: inviteEmail }, {
+                headers: { Authorization: `${localStorage.getItem('authToken')}` }
+            });
+            closeInviteModal();
+            alert("Invitation sent successfully!");
+        } catch (error) {
+            console.error('Failed to send invitation:', error);
+        }
+    };
+
     return (
         <div style={styles.container}>
             <div style={styles.header}>
-                {isEditing ? (
-                    <div>
-                        <input
-                            type="text"
-                            value={planTitle}
-                            onChange={(e) => setPlanTitle(e.target.value)}
-                            style={styles.input}
+                <div>
+                    {isEditing ? (
+                        <>
+                            <input
+                                type="text"
+                                value={planTitle}
+                                onChange={(e) => setPlanTitle(e.target.value)}
+                                style={styles.input}
+                            />
+                            <button style={styles.button} onClick={handleTitleChange}>Save</button>
+                            <button style={styles.buttonSecondary} onClick={() => setIsEditing(false)}>Cancel</button>
+                        </>
+                    ) : (
+                        <>
+                            {planTitle}
+                            <button style={styles.button} onClick={() => setIsEditing(true)}>Edit</button>
+                            <button style={styles.planDeleteButton} onClick={deletePlan}>Delete</button>
+                        </>
+                    )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {coworkers.map(coworker => (
+                        <img
+                            key={coworker.id}
+                            src={coworker.imageUrl}
+                            alt={coworker.nickname}
+                            style={styles.profileImage}
+                            title={coworker.nickname}
                         />
-                        <button style={styles.button} onClick={handleTitleChange}>Save</button>
-                        <button style={styles.buttonSecondary} onClick={() => setIsEditing(false)}>Cancel</button>
-                    </div>
-                ) : (
-                    <div>
-                        {planTitle}
-                        <button style={styles.button} onClick={() => setIsEditing(true)}>Edit</button>
-                        <button style={styles.planDeleteButton} onClick={deletePlan}>delete</button>
-                    </div>
-                )}
+                    ))}
+                    <button style={styles.inviteButton} onClick={openInviteModal}>
+                        Invite
+                    </button>
+                </div>
             </div>
             <div style={styles.mapContainer} ref={mapContainerRef}></div>
             <div style={styles.form}>
@@ -871,7 +916,7 @@ function Plan() {
                                     style={styles.column}
                                 >
                                     <h3>{column.title}</h3>
-                                    <button style={styles.planDeleteButton} onClick={() => deleteColumn(column)}>delete</button>
+                                    <button style={styles.planDeleteButton} onClick={() => deleteColumn(column)}>Delete</button>
                                     <button style={styles.button} onClick={() => handleEditColumn(column)}>Edit</button>
                                     <p style={{color: '#999'}}>Date: {column.date}</p>
                                     {cards[column.id] && cards[column.id].map(
@@ -893,7 +938,7 @@ function Plan() {
                                                         <h4 style={styles.cardTitle}>{card.title}</h4>
                                                         <button
                                                             style={styles.planDeleteButton}
-                                                            onClick={() => deleteCard(column, card)}>delete
+                                                            onClick={() => deleteCard(column, card)}>Delete
                                                         </button>
 
                                                         <p style={styles.cardText}>Place: {card.placeName}</p>
@@ -910,6 +955,34 @@ function Plan() {
                     ))}
                 </div>
             </DragDropContext>
+
+            {inviteModalIsOpen && (
+                <>
+                    <div style={styles.modalOverlay} onClick={closeInviteModal}></div>
+                    <div style={styles.modal}>
+                        <h2>Invite a Collaborator</h2>
+                        <input
+                            type="email"
+                            value={inviteEmail}
+                            onChange={handleInviteEmailChange}
+                            placeholder="Enter the email"
+                            style={styles.modalInput}
+                        />
+                        <button
+                            onClick={handleInviteSubmit}
+                            style={{ ...styles.modalButton, ...styles.saveButton }}
+                        >
+                            Send Invite
+                        </button>
+                        <button
+                            onClick={closeInviteModal}
+                            style={{ ...styles.modalButton, ...styles.cancelButton }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </>
+            )}
         </div>
     );
 }

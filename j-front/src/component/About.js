@@ -18,7 +18,7 @@ function About() {
     try {
       const response = await apiClient.get(`/users/${userId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          Authorization: `${localStorage.getItem('authToken')}`
         }
       });
       const {data} = response.data;
@@ -36,7 +36,7 @@ function About() {
     try {
       const response = await apiClient.get(`/plans?userId=${userId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          Authorization: `${localStorage.getItem('authToken')}`
         }
       });
       const {data} = response.data;
@@ -51,7 +51,7 @@ function About() {
     try {
       const response = await apiClient.get(`/users/${userId}/posts`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          Authorization: `${localStorage.getItem('authToken')}`
         }
       });
       const {data} = response.data;

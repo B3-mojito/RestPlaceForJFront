@@ -12,6 +12,7 @@ function Posting() {
   const [title, setTitle] = useState(''); // title 상태 추가
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [postDetails, setPostDetails] = useState({
@@ -24,7 +25,23 @@ function Posting() {
   const mapContainerRef = useRef(null);
   const navigate = useNavigate();
 
+
+
   useEffect(() => {
+    const fetchLoggedInUser = async () => {
+      try {
+        const response = await apiClient.get('/users/me', {
+          headers: {
+            Authorization: `${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        setLoggedInUserId(response.data.data.userId);
+      } catch (error) {
+        console.error('Error fetching logged-in user details:', error);
+      }
+    };
+    fetchLoggedInUser();
     loadKakaoMapsScript();
   }, []);
 
@@ -120,7 +137,7 @@ function Posting() {
 
         const imageResponse = await apiClient.post('/images', imageData, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            Authorization: `${localStorage.getItem('authToken')}`,
             'Content-Type': 'multipart/form-data'
           }
         });
@@ -142,16 +159,16 @@ function Posting() {
 
       const postResponse = await apiClient.post('/posts', postPayload, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          Authorization: `${localStorage.getItem('authToken')}`
         }
       });
 
       if (postResponse.data && postResponse.data.data) {
         // 성공적으로 게시물 작성 후 메시지 표시
-        toast.success('게시물이 성공적으로 작성되었습니다!', {
-          onClose: () => navigate('/') // 메시지 표시 후 페이지 이동
-        });
-      }
+        prompt("포스팅 완료 !")
+        navigate(`/post/${postResponse.data.id}`) // 메시지 표시 후 페이지 이동
+        }
+
     } catch (error) {
       console.error('Failed to create post:', error);
       toast.error('게시물 작성에 실패했습니다.');
