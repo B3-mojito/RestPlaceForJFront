@@ -12,7 +12,8 @@ import ProtectedRoute from "./context/ProtectedRoute";
 import Plan from './component/PlanView';
 import PlanPage from "./component/PlanPage";
 import PostDetail from "./component/PostDetail";
-import EditPost from "./component/EidtPost"; // Plan 컴포넌트 임포트
+import EditPost from "./component/EidtPost";
+import Footer from './component/Footer';
 
 const Login = lazy(() => import('./component/Login'));
 const Home = lazy(() => import('./pages/Home'));
@@ -44,6 +45,7 @@ function App() {
                     <Route path="/" element={<Navigate to="/home" />} />
                 </Routes>
             </Suspense>
+            <Footer />
         </Router>
     );
 }
