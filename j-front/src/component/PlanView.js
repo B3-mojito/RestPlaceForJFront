@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import apiClient from "../helpers/apiClient";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -215,10 +215,12 @@ function Plan() {
     const [selectedColumnId, setSelectedColumnId] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [mapsLoaded, setMapsLoaded] = useState(false);
+    const [relatedPosts, setRelatedPosts] = useState({});
 
     const mapContainerRef = useRef(null);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [editColumnData, setEditColumnData] = useState({ id: null, title: '', date: '' });
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchColumns2();
@@ -565,7 +567,7 @@ function Plan() {
         }
     };
 
-    const handleEditCard = (card) => {
+    const handleEditCard = async (card) => {
         setEditingCardId(card.id);
         setSelectedColumnId(card.columnId);
         setCardDetails({
@@ -576,6 +578,16 @@ function Plan() {
             endedAt: card.endedAt || '',
             memo: card.memo || ''
         });
+
+        try {
+            const response = await apiClient.get(`/cards/${card.id}/posts`, {
+                headers: { Authorization: `${localStorage.getItem('authToken')}` }
+            });
+
+            setRelatedPosts(response.data.data.contentList);
+        } catch (error) {
+            console.error('Failed to fetch related posts:', error);
+        }
     };
 
     const handleCardDetailsChange = (e) => {
@@ -646,6 +658,9 @@ function Plan() {
             placeName: place.place_name
         }));
         setSearchResults([]);
+    };
+    const handleRelatedPostClick = (postId) => {
+        navigate(`/posts/${postId}`);
     };
 
     return (
@@ -772,6 +787,26 @@ function Plan() {
                         placeholder="Memo"
                         style={styles.input}
                     />
+
+                    {/* Display Related Posts */}
+                    <div>
+                        <h4>Related posts:</h4>
+                        {relatedPosts.length > 0 ? (
+                            <ul>
+                                {relatedPosts.map((post) => (
+                                    <li key={post.id}
+                                        onClick={() => handleRelatedPostClick(post.id)}
+                                        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                    >
+                                        {post.title}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No related posts found.</p>
+                        )}
+                    </div>
+
                     <div>
                         <input
                             type="text"
