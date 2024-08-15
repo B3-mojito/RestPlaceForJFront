@@ -85,9 +85,6 @@ function PostList() {
       setTotalPages(0);
     }
   };
-  useEffect(() => {
-    fetchPlaces(currentPage);
-  }, [currentPage, region, theme]);
 
   const handleSearch = () => {
     setCurrentPage(1);
@@ -111,6 +108,7 @@ function PostList() {
 
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
+    fetchPosts(currentPage, selectedPlace, e.target.value);
   };
 
   const handlePostClick = (post) => {

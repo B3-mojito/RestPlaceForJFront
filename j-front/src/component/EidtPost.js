@@ -21,13 +21,32 @@ function EditPost() {
     themeEnum: ''
   });
   const [mapsLoaded, setMapsLoaded] = useState(false);
-
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
   const mapContainerRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load the existing post details
+    const fetchLoggedInUser = async () => {
+      try {
+        const response = await apiClient.get('/users/me', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        setLoggedInUserId(response.data.data.userId);
+      } catch (error) {
+        console.error('Failed to fetch logged-in user details:', error);
+      }
+    };
+
+    fetchLoggedInUser();
+  }, []);
+
+  useEffect(() => {
     const fetchPostDetails = async () => {
+      if (!loggedInUserId) return;
+
       try {
         const response = await apiClient.get(`/posts/${postId}`, {
           headers: {
@@ -46,14 +65,22 @@ function EditPost() {
         if (postData.imageList && postData.imageList.length > 0) {
           setPreviewImage(postData.imageList[0].imageUrl);
         }
+
+        // Redirect to home if the logged-in user is not the author
+        if (postData.userId !== loggedInUserId) {
+          toast.error('접근 권한이 없습니다.');
+          navigate('/');
+        }
       } catch (error) {
         console.error('Failed to load post details:', error);
       }
     };
 
-    fetchPostDetails();
+    if (loggedInUserId) {
+      fetchPostDetails();
+    }
     loadKakaoMapsScript();
-  }, [postId]);
+  }, [postId, loggedInUserId, navigate]);
 
   useEffect(() => {
     if (mapsLoaded && mapContainerRef.current) {
@@ -210,6 +237,7 @@ function EditPost() {
     setSearchQuery('');
     setSearchResults([]);
   };
+
   const handleCancel = () => {
     navigate(`/posts/${postId}`);
   };
@@ -233,7 +261,7 @@ function EditPost() {
           <div className="mb-3">
             <FloatingLabel controlId="floatingSearch">
               <div ref={mapContainerRef}
-                   style={{height: '400px', position: 'relative'}}>
+                   style={{ height: '400px', position: 'relative' }}>
                 <input
                     type="text"
                     placeholder="Search for places"
@@ -328,7 +356,7 @@ function EditPost() {
                   as="textarea"
                   placeholder="게시물 내용"
                   value={content}
-                  style={{height: '200px'}}
+                  style={{ height: '200px' }}
                   onChange={(e) => setContent(e.target.value)}
                   required
               />
@@ -338,7 +366,7 @@ function EditPost() {
           <div className="mb-3">
             <Form.Group controlId="formFile" className="mb-3">
               <Form.Label>프로필 이미지 업로드</Form.Label>
-              <Form.Control type="file" onChange={handleImageChange}/>
+              <Form.Control type="file" onChange={handleImageChange} />
             </Form.Group>
             {previewImage && (
                 <div className="mb-3">
@@ -346,7 +374,7 @@ function EditPost() {
                     width: '200px',
                     height: '200px',
                     objectFit: 'cover'
-                  }}/>
+                  }} />
                 </div>
             )}
           </div>
@@ -360,7 +388,7 @@ function EditPost() {
             </Button>
           </div>
         </Form>
-        <ToastContainer/>
+        <ToastContainer />
       </div>
   );
 }

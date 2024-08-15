@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Modal from 'react-modal';
 import apiClient from '../helpers/apiClient';
 
 const PostDetail = () => {
-  const {postId} = useParams();
+  const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -23,6 +23,9 @@ const PostDetail = () => {
   const [endedAt, setEndedAt] = useState('');
   const [memo, setMemo] = useState('');
 
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editCommentContent, setEditCommentContent] = useState('');
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,9 +33,6 @@ const PostDetail = () => {
     fetchPost();
     fetchPostImage();
     fetchPlans();
-  }, [postId]);
-
-  useEffect(() => {
     fetchComments();
   }, [postId, currentPage]);
 
@@ -109,14 +109,16 @@ const PostDetail = () => {
   const fetchComments = async () => {
     try {
       const response = await apiClient.get(
-          `/posts/${postId}/comments?page=${currentPage}&size=5`, {
+          `/posts/${postId}/comments?page=${currentPage}&size=5`,
+          {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json',
             },
-          });
+          }
+      );
 
-      const {contentList, totalPages} = response.data.data;
+      const { contentList, totalPages } = response.data.data;
       setComments(contentList);
       setTotalPages(totalPages);
     } catch (error) {
@@ -140,13 +142,16 @@ const PostDetail = () => {
 
   const handleCommentSubmit = async () => {
     try {
-      const response = await apiClient.post(`/posts/${postId}/comments`,
-          {content: newComment}, {
+      const response = await apiClient.post(
+          `/posts/${postId}/comments`,
+          { content: newComment },
+          {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json',
             },
-          });
+          }
+      );
 
       if (response.data) {
         setNewComment('');
@@ -175,7 +180,8 @@ const PostDetail = () => {
 
   const handleDeletePost = async () => {
     const confirmDelete = window.confirm(
-        'Are you sure you want to delete this post?');
+        'Are you sure you want to delete this post?'
+    );
     if (confirmDelete) {
       try {
         await apiClient.delete(`/posts/${postId}`, {
@@ -193,12 +199,16 @@ const PostDetail = () => {
 
   const handlePostLike = async () => {
     try {
-      const response = await apiClient.post(`/posts/${postId}/likes`, {}, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await apiClient.post(
+          `/posts/${postId}/likes`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+      );
 
       if (response.data) {
         fetchPost();
@@ -210,13 +220,16 @@ const PostDetail = () => {
 
   const handleCommentLike = async (commentId) => {
     try {
-      const response = await apiClient.post(`/comments/${commentId}/likes`, {},
+      const response = await apiClient.post(
+          `/comments/${commentId}/likes`,
+          {},
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json',
             },
-          });
+          }
+      );
 
       if (response.data) {
         fetchComments();
@@ -242,19 +255,22 @@ const PostDetail = () => {
     if (selectedCardId) {
       try {
         const response = await apiClient.patch(
-            `columns/${postId}/cards/${selectedCardId}`, {
+            `columns/${postId}/cards/${selectedCardId}`,
+            {
               title: post.title,
               address: post.address,
               placeName: post.placeName,
               startedAt: startedAt,
               endedAt: endedAt,
               memo: memo,
-            }, {
+            },
+            {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem('authToken')}`,
                 'Content-Type': 'application/json',
               },
-            });
+            }
+        );
 
         if (response.data) {
           closeModal();
@@ -264,19 +280,70 @@ const PostDetail = () => {
       }
     } else {
       try {
-        const response = await apiClient.post(`/posts/${postId}`,
-            addCardRequestDto, {
+        const response = await apiClient.post(
+            `/posts/${postId}`,
+            addCardRequestDto,
+            {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem('authToken')}`,
                 'Content-Type': 'application/json',
               },
-            });
+            }
+        );
 
         if (response.data) {
           closeModal();
         }
       } catch (error) {
         console.error('Error adding card to plan:', error);
+      }
+    }
+  };
+
+  const handleEditComment = (commentId, content) => {
+    setEditingCommentId(commentId);
+    setEditCommentContent(content);
+  };
+
+  const handleUpdateComment = async (commentId) => {
+    try {
+      const response = await apiClient.patch(
+          `/posts/${postId}/comments/${commentId}`,
+          { content: editCommentContent },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+      );
+
+      if (response.data) {
+        setEditingCommentId(null);
+        setEditCommentContent('');
+        fetchComments();
+      }
+    } catch (error) {
+      console.error('Error updating comment:', error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    const confirmDelete = window.confirm(
+        'Are you sure you want to delete this comment?'
+    );
+    if (confirmDelete) {
+      try {
+        await apiClient.delete(`/posts/${postId}/comments/${commentId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        fetchComments();
+      } catch (error) {
+        console.error('Error deleting comment:', error);
       }
     }
   };
@@ -293,10 +360,12 @@ const PostDetail = () => {
 
   useEffect(() => {
     if (isMapActive && post) {
-      loadKakaoMapsScript().then(() => {
+      loadKakaoMapsScript()
+      .then(() => {
         initKakaoMap(post.address);
-      }).catch(err => {
-        console.error("Failed to load Kakao Maps API", err);
+      })
+      .catch((err) => {
+        console.error('Failed to load Kakao Maps API', err);
       });
     }
   }, [isMapActive, post]);
@@ -307,7 +376,8 @@ const PostDetail = () => {
         resolve();
       } else {
         const script = document.createElement('script');
-        script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=f90abf763c49b09ee81cd9b1f5f0b3ef&libraries=services,clusterer,drawing&autoload=false";
+        script.src =
+            'https://dapi.kakao.com/v2/maps/sdk.js?appkey=f90abf763c49b09ee81cd9b1f5f0b3ef&libraries=services,clusterer,drawing&autoload=false';
         script.onload = () => {
           window.kakao.maps.load(() => {
             resolve();
@@ -326,7 +396,7 @@ const PostDetail = () => {
       const container = document.getElementById('kakaoMap');
       const options = {
         center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-        level: 3
+        level: 3,
       };
       const map = new window.kakao.maps.Map(container, options);
 
@@ -338,7 +408,7 @@ const PostDetail = () => {
 
           const marker = new window.kakao.maps.Marker({
             map: map,
-            position: coords
+            position: coords,
           });
         } else {
           console.error('Failed to convert address to coordinates:', status);
@@ -352,14 +422,16 @@ const PostDetail = () => {
   }
 
   return (
-      <div style={{padding: '20px'}}>
+      <div style={{ padding: '20px' }}>
         <h1>{post.title}</h1>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <div style={{display: 'flex', alignItems: 'center'}}>
+        <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             {post.profileImage && (
                 <img
                     src={post.profileImage}
@@ -374,29 +446,32 @@ const PostDetail = () => {
                 />
             )}
             <span onClick={() => navigate(`/about/${post.userId}`)}>
-        {post.nickName}
-      </span>
+            {post.nickName}
+          </span>
           </div>
-
-          {loggedInUserId === post.userId && (
-              <div>
-                <button onClick={handleEditPost} style={{marginRight: '10px'}}>
-                  수정
-                </button>
-                <button onClick={handleDeletePost}
-                        style={{color: 'red', marginRight: '10px'}}>
-                  삭제
-                </button>
-                <button onClick={openModal}>계획에 추가</button>
-              </div>
-          )}
+          <div>
+            {loggedInUserId === post.userId && (
+                <div>
+                  <button onClick={handleEditPost} style={{ marginRight: '10px' }}>
+                    수정
+                  </button>
+                  <button
+                      onClick={handleDeletePost}
+                      style={{ color: 'red', marginRight: '10px' }}
+                  >
+                    삭제
+                  </button>
+                </div>
+            )}
+            <button onClick={openModal}>계획에 추가</button>
+          </div>
         </div>
-
-        <div style={{marginTop: '10px'}}>
-          <span style={{display: 'block'}}>조회수 {post.viewsCount}</span>
-          <span style={{display: 'block'}}>좋아요 {post.likesCount}</span>
-          <span
-              style={{display: 'block'}}>📍{post.address} {post.placeName}</span>
+        <div style={{ marginTop: '10px' }}>
+          <span style={{ display: 'block' }}>조회수 {post.viewsCount}</span>
+          <span style={{ display: 'block' }}>좋아요 {post.likesCount}</span>
+          <span style={{ display: 'block' }}>
+          📍{post.address} {post.placeName}
+        </span>
         </div>
 
         <div
@@ -412,7 +487,7 @@ const PostDetail = () => {
         ></div>
 
         {postImage && (
-            <div style={{marginTop: '20px'}}>
+            <div style={{ marginTop: '20px' }}>
               <img
                   src={postImage}
                   alt="Post Image"
@@ -425,17 +500,19 @@ const PostDetail = () => {
             </div>
         )}
 
-        <div style={{marginTop: '20px'}}>
+        <div style={{ marginTop: '20px' }}>
           <p>{post.content}</p>
         </div>
 
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: '20px',
-          flexDirection: 'column'
-        }}>
+        <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: '20px',
+              flexDirection: 'column',
+            }}
+        >
           <button
               onClick={handlePostLike}
               style={{
@@ -448,22 +525,25 @@ const PostDetail = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: '50px',
-                height: '50px'
-              }}>
+                height: '50px',
+              }}
+          >
             ❤️
           </button>
         </div>
 
-
-        <div style={{marginTop: '40px'}}>
+        <div style={{ marginTop: '40px' }}>
           <h4>Comments</h4>
           {comments.length > 0 ? (
               comments.map((comment, index) => (
-                  <div key={index} style={{
-                    marginBottom: '10px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
+                  <div
+                      key={index}
+                      style={{
+                        marginBottom: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                  >
                     {comment.profileImage && (
                         <img
                             src={comment.profileImage}
@@ -472,19 +552,62 @@ const PostDetail = () => {
                               width: '30px',
                               height: '30px',
                               borderRadius: '50%',
-                              marginRight: '10px'
+                              marginRight: '10px',
                             }}
                             onClick={() => navigate(`/about/${comment.userId}`)}
                         />
                     )}
                     <div>
-                      <strong onClick={() => navigate(
-                          `/about/${comment.userId}`)}>{comment.nickName}</strong>: {comment.content}
-                      <button onClick={() => handleCommentLike(comment.id)}
-                              style={{marginLeft: '10px'}}>❤️
+                      <strong
+                          onClick={() => navigate(`/about/${comment.userId}`)}
+                      >
+                        {comment.nickName}
+                      </strong>{' '}
+                      :{' '}
+                      {editingCommentId === comment.id ? (
+                          <>
+                            <input
+                                type="text"
+                                value={editCommentContent}
+                                onChange={(e) =>
+                                    setEditCommentContent(e.target.value)
+                                }
+                            />
+                            <button onClick={() => handleUpdateComment(comment.id)}>
+                              저장
+                            </button>
+                            <button onClick={() => setEditingCommentId(null)}>
+                              취소
+                            </button>
+                          </>
+                      ) : (
+                          <span>{comment.content}</span>
+                      )}
+                      <button
+                          onClick={() => handleCommentLike(comment.id)}
+                          style={{ marginLeft: '10px' }}
+                      >
+                        ❤️
                       </button>
-                      <span
-                          style={{marginLeft: '5px'}}>{comment.likesCount}</span>
+                      <span style={{ marginLeft: '5px' }}>{comment.likesCount}</span>
+                      {loggedInUserId === comment.userId && (
+                          <>
+                            <button
+                                onClick={() =>
+                                    handleEditComment(comment.id, comment.content)
+                                }
+                                style={{ marginLeft: '10px' }}
+                            >
+                              수정
+                            </button>
+                            <button
+                                onClick={() => handleDeleteComment(comment.id)}
+                                style={{ marginLeft: '10px', color: 'red' }}
+                            >
+                              삭제
+                            </button>
+                          </>
+                      )}
                     </div>
                   </div>
               ))
@@ -492,14 +615,18 @@ const PostDetail = () => {
               <p>No comments yet.</p>
           )}
 
-          <div style={{marginTop: '20px'}}>
-            <button onClick={handlePreviousPage}
-                    disabled={currentPage === 0}>Previous
+          <div style={{ marginTop: '20px' }}>
+            <button onClick={handlePreviousPage} disabled={currentPage === 0}>
+              Previous
             </button>
-            <span style={{margin: '0 10px'}}>Page {currentPage
-                + 1} of {totalPages}</span>
-            <button onClick={handleNextPage}
-                    disabled={currentPage >= totalPages - 1}>Next
+            <span style={{ margin: '0 10px' }}>
+            Page {currentPage + 1} of {totalPages}
+          </span>
+            <button
+                onClick={handleNextPage}
+                disabled={currentPage >= totalPages - 1}
+            >
+              Next
             </button>
           </div>
 
@@ -507,10 +634,13 @@ const PostDetail = () => {
               placeholder="댓글을 입력하세요"
               value={newComment}
               onChange={handleNewCommentChange}
-              style={{width: '100%', height: '100px', marginTop: '20px'}}
+              style={{ width: '100%', height: '100px', marginTop: '20px' }}
           ></textarea>
-          <button onClick={handleCommentSubmit}
-                  style={{marginTop: '10px', padding: '10px 20px'}}>댓글 등록
+          <button
+              onClick={handleCommentSubmit}
+              style={{ marginTop: '10px', padding: '10px 20px' }}
+          >
+            댓글 등록
           </button>
         </div>
 
@@ -519,47 +649,72 @@ const PostDetail = () => {
             onRequestClose={closeModal}
             contentLabel="추가 계획 모달"
             ariaHideApp={false}
-            style={{content: {zIndex: 1000}}}
+            style={{ content: { zIndex: 1000 } }}
         >
           <h2>카드로 추가 모달창</h2>
           <form onSubmit={handleAddCardToPlan}>
             <label htmlFor="plan">추가할 플랜을 선택하세요</label>
-            <select id="plan" value={selectedPlanId} onChange={handlePlanChange}
-                    required>
+            <select
+                id="plan"
+                value={selectedPlanId}
+                onChange={handlePlanChange}
+                required
+            >
               <option value="">플랜을 선택하세요</option>
-              {plans.map(plan => (
-                  <option key={plan.id} value={plan.id}>{plan.title}</option>
+              {plans.map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.title}
+                  </option>
               ))}
             </select>
 
             {cards.length > 0 && (
                 <>
                   <label htmlFor="card">추가할 카드를 선택하세요</label>
-                  <select id="card" value={selectedCardId}
-                          onChange={handleCardChange}>
+                  <select
+                      id="card"
+                      value={selectedCardId}
+                      onChange={handleCardChange}
+                  >
                     <option value="">카드를 선택하세요</option>
-                    {cards.map(card => (
-                        <option key={card.id}
-                                value={card.id}>{card.title}</option>
+                    {cards.map((card) => (
+                        <option key={card.id} value={card.id}>
+                          {card.title}
+                        </option>
                     ))}
                   </select>
                 </>
             )}
 
             <label htmlFor="startTime">시작시간</label>
-            <input type="time" id="startTime" value={startedAt}
-                   onChange={(e) => setStartedAt(e.target.value)} required/>
+            <input
+                type="time"
+                id="startTime"
+                value={startedAt}
+                onChange={(e) => setStartedAt(e.target.value)}
+                required
+            />
 
             <label htmlFor="endTime">종료시간</label>
-            <input type="time" id="endTime" value={endedAt}
-                   onChange={(e) => setEndedAt(e.target.value)} required/>
+            <input
+                type="time"
+                id="endTime"
+                value={endedAt}
+                onChange={(e) => setEndedAt(e.target.value)}
+                required
+            />
 
             <label htmlFor="memo">메모를 입력하세요</label>
-            <textarea id="memo" value={memo}
-                      onChange={(e) => setMemo(e.target.value)}></textarea>
+            <textarea
+                id="memo"
+                value={memo}
+                onChange={(e) => setMemo(e.target.value)}
+            ></textarea>
 
             <button type="submit">확인</button>
-            <button type="button" onClick={closeModal}>취소</button>
+            <button type="button" onClick={closeModal}>
+              취소
+            </button>
           </form>
         </Modal>
       </div>

@@ -1,24 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Container, Nav, Navbar } from 'react-bootstrap';
+import apiClient from '../helpers/apiClient'; // Ensure you have an API client set up for making API calls
 
 function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // 로컬 스토리지에서 authToken 확인
+    // Check if the user is authenticated by checking for a token in local storage
     const token = localStorage.getItem('authToken');
     if (token) {
       setIsAuthenticated(true);
+      fetchUserProfile();
     } else {
       setIsAuthenticated(false);
     }
   }, []);
 
+  const fetchUserProfile = async () => {
+    try {
+      const response = await apiClient.get('/users/myPage', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      setUser(response.data.data);
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error);
+    }
+  };
+
   const handleLogout = () => {
-    // 로컬 스토리지에서 authToken 삭제
+    // Remove tokens from local storage
     localStorage.removeItem('authToken');
+    localStorage.removeItem('RefreshToken');
     setIsAuthenticated(false);
-    // 로그아웃 후 리디렉션
+    // Redirect to the home page after logging out
     window.location.href = '/';
   };
 
@@ -27,25 +45,40 @@ function Header() {
         <Container>
           <Navbar.Brand href="/">J의 안식처</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link href="/plan">계획 짜기</Nav.Link>
-              <Nav.Link href="/post">추천 게시물 보기</Nav.Link>
-              <NavDropdown title="메뉴" id="basic-nav-dropdown">
+          <div style={{ marginRight: '15px' }}>
+            <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="me-auto">
                 {!isAuthenticated ? (
                     <>
-                      <NavDropdown.Item href="/login">로그인</NavDropdown.Item>
-                      <NavDropdown.Item href="/signup">회원가입</NavDropdown.Item>
+                      <Nav.Link href="/login">로그인</Nav.Link>
+                      <Nav.Link href="/signup">회원가입</Nav.Link>
                     </>
                 ) : (
                     <>
-                      <NavDropdown.Item href="/mypage">마이페이지</NavDropdown.Item>
-                      <NavDropdown.Item onClick={handleLogout}>로그아웃</NavDropdown.Item>
+                      {user && (
+                          <div style={{ display: 'flex', alignItems: 'center', marginRight: '15px' }}>
+                            {user.profileImage && (
+                                <img
+                                    src={user.profileImage}
+                                    alt="Profile"
+                                    style={{
+                                      width: '40px',
+                                      height: '40px',
+                                      borderRadius: '50%',
+                                      marginRight: '10px',
+                                    }}
+                                />
+                            )}
+                            <span>{user.nickname} 님! 환영합니다!! </span>
+                          </div>
+                      )}
+                      <Nav.Link href="/mypage">마이페이지</Nav.Link>
+                      <Nav.Link onClick={handleLogout}>로그아웃</Nav.Link>
                     </>
                 )}
-              </NavDropdown>
-            </Nav>
-          </Navbar.Collapse>
+              </Nav>
+            </Navbar.Collapse>
+          </div>
         </Container>
       </Navbar>
   );
