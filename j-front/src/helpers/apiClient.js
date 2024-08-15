@@ -10,7 +10,7 @@ const refreshToken = async () => {
     console.log("토큰 재발급")
     const response = await axios.post('https://api.restplaceforj.com/v1/users/reissue',{}, {
       headers: {
-        Authorization: localStorage.getItem('authToken') // Assuming you're using JWT
+        RefreshToken: localStorage.getItem('RefreshToken') // Assuming you're using JWT
       }
     });
     const newToken = response.headers.get('Authorization'); // Adjust based on your header name

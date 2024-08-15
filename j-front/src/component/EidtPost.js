@@ -3,13 +3,14 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import apiClient from "../helpers/apiClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function Posting() {
+function EditPost() {
+  const { postId } = useParams();  // Get the post ID from the URL
   const [content, setContent] = useState('');
-  const [title, setTitle] = useState(''); // title 상태 추가
+  const [title, setTitle] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,38 +18,82 @@ function Posting() {
   const [postDetails, setPostDetails] = useState({
     address: '',
     placeName: '',
-    themeEnum: 'HEALING'
+    themeEnum: ''
   });
   const [mapsLoaded, setMapsLoaded] = useState(false);
-
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
   const mapContainerRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadKakaoMapsScript();
+    const fetchLoggedInUser = async () => {
+      try {
+        const response = await apiClient.get('/users/me', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        setLoggedInUserId(response.data.data.userId);
+      } catch (error) {
+        console.error('Failed to fetch logged-in user details:', error);
+      }
+    };
+
+    fetchLoggedInUser();
   }, []);
 
   useEffect(() => {
+    const fetchPostDetails = async () => {
+      if (!loggedInUserId) return;
+
+      try {
+        const response = await apiClient.get(`/posts/${postId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        const postData = response.data.data;
+        setTitle(postData.title);
+        setContent(postData.content);
+        setPostDetails({
+          address: postData.address,
+          placeName: postData.placeName,
+          themeEnum: postData.themeEnum
+        });
+        if (postData.imageList && postData.imageList.length > 0) {
+          setPreviewImage(postData.imageList[0].imageUrl);
+        }
+
+        // Redirect to home if the logged-in user is not the author
+        if (postData.userId !== loggedInUserId) {
+          toast.error('접근 권한이 없습니다.');
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Failed to load post details:', error);
+      }
+    };
+
+    if (loggedInUserId) {
+      fetchPostDetails();
+    }
+    loadKakaoMapsScript();
+  }, [postId, loggedInUserId, navigate]);
+
+  useEffect(() => {
     if (mapsLoaded && mapContainerRef.current) {
+      // Initialize Kakao Maps
       const mapContainer = mapContainerRef.current;
       const mapOptions = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.978),
+        center: new window.kakao.maps.LatLng(37.5665, 126.9780),
         level: 3
       };
 
       const map = new window.kakao.maps.Map(mapContainer, mapOptions);
       const ps = new window.kakao.maps.services.Places();
       const geocoder = new window.kakao.maps.services.Geocoder();
-
-      const searchPlaces = (query) => {
-        ps.keywordSearch(query, (data, status) => {
-          if (status === window.kakao.maps.services.Status.OK) {
-            setSearchResults(data);
-          } else {
-            console.error('Search failed:', status);
-          }
-        });
-      };
 
       const handleMapClick = (mouseEvent) => {
         const latlng = mouseEvent.latLng;
@@ -104,7 +149,7 @@ function Posting() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setProfileImage(file);
-    setPreviewImage(URL.createObjectURL(file)); // Set the preview image
+    setPreviewImage(URL.createObjectURL(file));
   };
 
   const handleSavePost = async (e) => {
@@ -113,7 +158,7 @@ function Posting() {
     try {
       let imageId = null;
 
-      // 이미지가 선택된 경우 업로드
+      // Upload image if a new one is selected
       if (profileImage) {
         const imageData = new FormData();
         imageData.append('images', profileImage);
@@ -126,35 +171,34 @@ function Posting() {
         });
 
         if (imageResponse.data && imageResponse.data.data) {
-          imageId = imageResponse.data.data.id; // 서버에서 반환된 이미지 ID
+          imageId = imageResponse.data.data.id;
         }
       }
 
-      // 게시물 작성
+      // Update the post
       const postPayload = {
-        title: title, // 제목 추가
+        title: title,
         content: content,
         address: postDetails.address,
         placeName: postDetails.placeName,
         theme: postDetails.themeEnum,
-        imageIdList: imageId ? [imageId] : [] // 이미지 ID를 배열로 전달
+        imageIdList: imageId ? [imageId] : []  // Use new image if uploaded
       };
 
-      const postResponse = await apiClient.post('/posts', postPayload, {
+      const postResponse = await apiClient.patch(`/posts/${postId}`, postPayload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }
       });
 
       if (postResponse.data && postResponse.data.data) {
-        // 성공적으로 게시물 작성 후 메시지 표시
-        toast.success('게시물이 성공적으로 작성되었습니다!', {
-          onClose: () => navigate('/') // 메시지 표시 후 페이지 이동
+        toast.success('게시물이 성공적으로 수정되었습니다!', {
+          onClose: () => navigate(`/posts/${postId}`) // Redirect to the post details page
         });
       }
     } catch (error) {
-      console.error('Failed to create post:', error);
-      toast.error('게시물 작성에 실패했습니다.');
+      console.error('Failed to update post:', error);
+      toast.error('게시물 수정에 실패했습니다.');
     }
   };
 
@@ -194,16 +238,20 @@ function Posting() {
     setSearchResults([]);
   };
 
+  const handleCancel = () => {
+    navigate(`/posts/${postId}`);
+  };
+
   return (
       <div className="container">
-        <h3>게시물 작성하기</h3>
+        <h3>게시물 수정하기</h3>
         <Form onSubmit={handleSavePost}>
           <div className="mb-3">
             <FloatingLabel controlId="floatingTitle" label="제목을 입력하세요">
               <Form.Control
                   type="text"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)} // 제목 상태 업데이트
+                  onChange={(e) => setTitle(e.target.value)}
                   placeholder="제목을 입력하세요"
                   required
               />
@@ -212,13 +260,21 @@ function Posting() {
 
           <div className="mb-3">
             <FloatingLabel controlId="floatingSearch">
-              <div ref={mapContainerRef} style={{ height: '400px', position: 'relative' }}>
+              <div ref={mapContainerRef}
+                   style={{ height: '400px', position: 'relative' }}>
                 <input
                     type="text"
                     placeholder="Search for places"
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    style={{ position: 'absolute', top: '10px', left: '10px', zIndex: '1', width: 'calc(100% - 20px)', padding: '5px' }}
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      left: '10px',
+                      zIndex: '1',
+                      width: 'calc(100% - 20px)',
+                      padding: '5px'
+                    }}
                 />
               </div>
             </FloatingLabel>
@@ -227,7 +283,7 @@ function Posting() {
           <div>
             <input
                 type="text"
-                placeholder="장소를 검색하세요!"
+                placeholder="Search for places"
                 onChange={handleSearchChange}
             />
             <ul>
@@ -240,7 +296,7 @@ function Posting() {
           </div>
 
           <div className="mb-3">
-            <FloatingLabel controlId="floatingPlaceName" label="장소명">
+            <FloatingLabel controlId="floatingPlaceName" label="Place Name">
               <Form.Control
                   type="text"
                   value={postDetails.placeName}
@@ -254,7 +310,7 @@ function Posting() {
           </div>
 
           <div className="mb-3">
-            <FloatingLabel controlId="floatingAddress" label="주소">
+            <FloatingLabel controlId="floatingAddress" label="Address">
               <Form.Control
                   type="text"
                   value={postDetails.address}
@@ -268,7 +324,8 @@ function Posting() {
           </div>
 
           <div className="mb-3">
-            <FloatingLabel controlId="floatingSelectActivity" label="활동을 선택해주세요">
+            <FloatingLabel controlId="floatingSelectActivity"
+                           label="활동을 선택해주세요">
               <Form.Select
                   aria-label="Floating label select example"
                   value={postDetails.themeEnum}
@@ -308,23 +365,32 @@ function Posting() {
 
           <div className="mb-3">
             <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>이미지 업로드</Form.Label>
+              <Form.Label>프로필 이미지 업로드</Form.Label>
               <Form.Control type="file" onChange={handleImageChange} />
             </Form.Group>
             {previewImage && (
                 <div className="mb-3">
-                  <img src={previewImage} alt="미리보기" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
+                  <img src={previewImage} alt="미리보기" style={{
+                    width: '200px',
+                    height: '200px',
+                    objectFit: 'cover'
+                  }} />
                 </div>
             )}
           </div>
 
-          <Button variant="primary" type="submit">
-            게시물 작성하기
-          </Button>
+          <div className="d-flex justify-content-between">
+            <Button variant="primary" type="submit">
+              게시물 수정하기
+            </Button>
+            <Button variant="secondary" type="button" onClick={handleCancel}>
+              취소
+            </Button>
+          </div>
         </Form>
         <ToastContainer />
       </div>
   );
 }
 
-export default Posting;
+export default EditPost;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import apiClient from "../helpers/apiClient";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -30,6 +30,47 @@ const styles = {
         cursor: 'pointer',
         transition: 'background-color 0.3s ease',
         marginLeft: '10px',
+    },
+    // 플랜 삭제 버튼
+    planDeleteButton: {
+        padding: '10px 20px',
+        fontSize: '14px',
+        borderRadius: '8px',
+        backgroundColor: '#ff4d4f',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease',
+        marginLeft: '10px',
+    },
+    deleteButton: {
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        width: '30px',
+        height: '30px',
+        backgroundColor: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        padding: 0,
+    },
+    deleteButtonIcon: {
+        position: 'relative',
+        width: '20px',
+        height: '20px',
+    },
+    xShape: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '100%',
+        height: '2px',
+        backgroundColor: 'black',
+        transform: 'translate(-50%, -50%) rotate(45deg)',
+        content: '""',
+    },
+    xShapeAfter: {
+        transform: 'translate(-50%, -50%) rotate(-45deg)',
     },
     buttonSecondary: {
         padding: '10px 20px',
@@ -106,6 +147,49 @@ const styles = {
     formButton: {
         alignSelf: 'flex-start',
     },
+    modal: {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#fff',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        zIndex: 1000,
+        width: '300px',
+    },
+    modalOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 999,
+    },
+    modalInput: {
+        width: '100%',
+        padding: '10px',
+        borderRadius: '4px',
+        marginBottom: '10px',
+        border: '1px solid #ddd',
+    },
+    modalButton: {
+        padding: '10px 20px',
+        borderRadius: '4px',
+        border: 'none',
+        cursor: 'pointer',
+        marginRight: '10px',
+    },
+    saveButton: {
+        backgroundColor: '#4CAF50',
+        color: 'white',
+    },
+    cancelButton: {
+        backgroundColor: '#f44336',
+        color: 'white',
+    },
 };
 
 function Plan() {
@@ -125,14 +209,58 @@ function Plan() {
         endedAt: '',
         memo: ''
     });
-    const [newColumnTitle, setNewColumnTitle] = useState('');
-    const [newCardTitle, setNewCardTitle] = useState('');
+    const [newColumnTitle, setNewColumnTitle] = useState('default');
+    const [newCardTitle, setNewCardTitle] = useState('default');
     const [newCardDescription, setNewCardDescription] = useState('');
     const [selectedColumnId, setSelectedColumnId] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [mapsLoaded, setMapsLoaded] = useState(false);
+    const [relatedPosts, setRelatedPosts] = useState({});
 
     const mapContainerRef = useRef(null);
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [editColumnData, setEditColumnData] = useState({ id: null, title: '', date: '' });
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        fetchColumns2();
+    }, []);
+
+    const fetchColumns2 = async () => {
+        try {
+            const response = await apiClient.get(`/plans/${plan.id}/columns`, {
+                headers: {
+                    Authorization: `${localStorage.getItem('authToken')}`
+                }
+            });
+            setColumns(response.data.data);
+        } catch (error) {
+            console.error('Failed to fetch columns:', error);
+        }
+    };
+
+    const handleEditColumn = (column) => {
+        setEditColumnData({ id: column.id, title: column.title, date: column.date });
+        setEditModalVisible(true);
+    };
+
+    const handleSaveColumn = async () => {
+        try {
+            await apiClient.patch(
+                `/plans/${plan.id}/columns/${editColumnData.id}`,
+                { title: editColumnData.title, date: editColumnData.date },
+                { headers: { Authorization: `${localStorage.getItem('authToken')}` } }
+            );
+            setEditModalVisible(false);
+            fetchColumns2();
+        } catch (error) {
+            console.error('Failed to update column:', error);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditModalVisible(false);
+    };
 
     useEffect(() => {
         fetchColumns();
@@ -160,7 +288,7 @@ function Plan() {
     }, [mapsLoaded]);
 
     const loadKakaoMapsScript = () => {
-        const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a84090a0ae739cccb8c34d58fca902b1&libraries=services,clusterer,drawing&autoload=false";
+        const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=f90abf763c49b09ee81cd9b1f5f0b3ef&libraries=services,clusterer,drawing&autoload=false"
         if (window.kakao && window.kakao.maps) {
             setMapsLoaded(true);
             return;
@@ -310,6 +438,63 @@ function Plan() {
         }
     };
 
+// 플랜 삭제 함수
+    const deletePlan = async () => {
+        // 사용자에게 경고창을 띄워 확인 요청
+        const confirmed = window.confirm("정말로 이 플랜을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+
+        // 사용자가 확인을 누른 경우에만 삭제 작업 진행
+        if (confirmed) {
+            try {
+                await apiClient.delete(`/plans/${plan.id}`);
+                console.log("플랜 삭제 완료");
+                window.location.href = '/plan'; // 홈 페이지로 리다이렉트
+            } catch (error) {
+                console.error('Error deleting plan:', error);
+            }
+        } else {
+            console.log("플랜 삭제가 취소되었습니다.");
+        }
+    };
+
+    const deleteColumn = async (column) => {
+        // 사용자에게 경고창을 띄워 확인 요청
+        const confirmed = window.confirm("정말로 이 컬럼을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+
+        // 사용자가 확인을 누른 경우에만 삭제 작업 진행
+        if (confirmed) {
+            try {
+                await apiClient.delete(`/plans/${plan.id}/columns/${column.id}`);
+                console.log("컬럼 삭제 완료");
+                fetchColumns();
+            } catch (error) {
+                console.error('Error deleting plan:', error);
+            }
+        } else {
+            console.log("컬럼 삭제가 취소되었습니다.");
+        }
+    };
+
+    // 카드 삭제 함수
+    const deleteCard = async (column, card) => {
+        // 사용자에게 경고창을 띄워 확인 요청
+        const confirmed = window.confirm("정말로 이 카드을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+
+        // 사용자가 확인을 누른 경우에만 삭제 작업 진행
+        if (confirmed) {
+            try {
+                await apiClient.delete(`/columns/${column.id}/cards/${card.id}`);
+
+                console.log("카드 삭제 완료");
+                fetchColumns();
+            } catch (error) {
+                console.error('Error deleting plan:', error);
+            }
+        } else {
+            console.log("카드 삭제가 취소되었습니다.");
+        }
+    };
+
     const handleAddCard = async () => {
         if (!selectedColumnId) {
             console.error('No column selected');
@@ -382,7 +567,7 @@ function Plan() {
         }
     };
 
-    const handleEditCard = (card) => {
+    const handleEditCard = async (card) => {
         setEditingCardId(card.id);
         setSelectedColumnId(card.columnId);
         setCardDetails({
@@ -393,6 +578,16 @@ function Plan() {
             endedAt: card.endedAt || '',
             memo: card.memo || ''
         });
+
+        try {
+            const response = await apiClient.get(`/cards/${card.id}/posts`, {
+                headers: { Authorization: `${localStorage.getItem('authToken')}` }
+            });
+
+            setRelatedPosts(response.data.data.contentList);
+        } catch (error) {
+            console.error('Failed to fetch related posts:', error);
+        }
     };
 
     const handleCardDetailsChange = (e) => {
@@ -464,6 +659,9 @@ function Plan() {
         }));
         setSearchResults([]);
     };
+    const handleRelatedPostClick = (postId) => {
+        navigate(`/posts/${postId}`);
+    };
 
     return (
         <div style={styles.container}>
@@ -483,6 +681,7 @@ function Plan() {
                     <div>
                         {planTitle}
                         <button style={styles.button} onClick={() => setIsEditing(true)}>Edit</button>
+                        <button style={styles.planDeleteButton} onClick={deletePlan}>delete</button>
                     </div>
                 )}
             </div>
@@ -588,6 +787,26 @@ function Plan() {
                         placeholder="Memo"
                         style={styles.input}
                     />
+
+                    {/* Display Related Posts */}
+                    <div>
+                        <h4>Related posts:</h4>
+                        {relatedPosts.length > 0 ? (
+                            <ul>
+                                {relatedPosts.map((post) => (
+                                    <li key={post.id}
+                                        onClick={() => handleRelatedPostClick(post.id)}
+                                        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                    >
+                                        {post.title}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No related posts found.</p>
+                        )}
+                    </div>
+
                     <div>
                         <input
                             type="text"
@@ -608,6 +827,39 @@ function Plan() {
                 </div>
             )}
 
+            {editModalVisible && (
+                <>
+                    <div style={styles.modalOverlay} onClick={handleCancelEdit}></div>
+                    <div style={styles.modal}>
+                        <input
+                            type="text"
+                            value={editColumnData.title}
+                            onChange={(e) => setEditColumnData({ ...editColumnData, title: e.target.value })}
+                            placeholder="Column Title"
+                            style={styles.modalInput}
+                        />
+                        <input
+                            type="date"
+                            value={editColumnData.date}
+                            onChange={(e) => setEditColumnData({ ...editColumnData, date: e.target.value })}
+                            style={styles.modalInput}
+                        />
+                        <button
+                            onClick={handleSaveColumn}
+                            style={{ ...styles.modalButton, ...styles.saveButton }}
+                        >
+                            Save
+                        </button>
+                        <button
+                            onClick={handleCancelEdit}
+                            style={{ ...styles.modalButton, ...styles.cancelButton }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </>
+            )}
+
             <DragDropContext onDragEnd={handleOnDragEnd}>
                 <div style={styles.columnContainer}>
                     {columns.map(column => (
@@ -619,10 +871,14 @@ function Plan() {
                                     style={styles.column}
                                 >
                                     <h3>{column.title}</h3>
-                                    <p style={{ color: '#999' }}>Date: {column.date}</p>
+                                    <button style={styles.planDeleteButton} onClick={() => deleteColumn(column)}>delete</button>
+                                    <button style={styles.button} onClick={() => handleEditColumn(column)}>Edit</button>
+                                    <p style={{color: '#999'}}>Date: {column.date}</p>
                                     {cards[column.id] && cards[column.id].map(
                                         (card, index) => (
-                                            <Draggable key={card.id} draggableId={card.id.toString()} index={index}>
+                                            <Draggable key={card.id}
+                                                       draggableId={card.id.toString()}
+                                                       index={index}>
                                                 {(provided) => (
                                                     <div
                                                         ref={provided.innerRef}
@@ -635,6 +891,11 @@ function Plan() {
                                                         onClick={() => handleEditCard(card)}
                                                     >
                                                         <h4 style={styles.cardTitle}>{card.title}</h4>
+                                                        <button
+                                                            style={styles.planDeleteButton}
+                                                            onClick={() => deleteCard(column, card)}>delete
+                                                        </button>
+
                                                         <p style={styles.cardText}>Place: {card.placeName}</p>
                                                         <p style={styles.cardText}>Start: {card.startedAt}</p>
                                                         <p style={styles.cardText}>End: {card.endedAt}</p>

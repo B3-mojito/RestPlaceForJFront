@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './MyPage.css';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Form } from 'react-bootstrap';
 import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
 import apiClient from "../helpers/apiClient";
+import { useNavigate } from 'react-router-dom';
 
 function MyPage() {
-    const [showModal, setShowModal] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const [showPlanModal, setShowPlanModal] = useState(false);
     const [userId, setUserId] = useState(null);
     const [nickname, setNickname] = useState('');
     const [bio, setBio] = useState('');
@@ -16,10 +18,47 @@ function MyPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [plans, setPlans] = useState([]);
     const [posts, setPosts] = useState([]);
-    const [isAddingPlan, setIsAddingPlan] = useState(false);
     const [newPlanTitle, setNewPlanTitle] = useState('');
+    const [isImageChanged, setIsImageChanged] = useState(false); // Track if the image has been changed
+    const navigate = useNavigate();
 
-    // Fetch user profile data
+    useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const response = await apiClient.get('/plans/myPlans', {
+                    headers: {
+                        Authorization: localStorage.getItem('authToken')
+                    }
+                });
+                setPlans(response.data.data);
+            } catch (error) {
+                console.error('Failed to fetch plans:', error);
+            }
+        };
+
+        fetchPlans();
+    }, []);
+
+    const handleCreatePlan = async () => {
+        try {
+            const response = await apiClient.post('/plans',
+                {
+                    title: newPlanTitle
+                },
+                {
+                    headers: {
+                        Authorization: localStorage.getItem('authToken')
+                    }
+                });
+
+            setPlans([...plans, response.data.data]);
+            setShowPlanModal(false);
+            setNewPlanTitle('');
+        } catch (error) {
+            console.error('Failed to create plan:', error);
+        }
+    };
+
     const fetchUserProfile = async () => {
         try {
             const response = await apiClient.get(`/users/myPage`, {
@@ -28,7 +67,7 @@ function MyPage() {
                 }
             });
             const { data } = response.data;
-            setUserId(data.id);
+            setUserId(data.userId);
             setNickname(data.nickname);
             setBio(data.bio);
             setProfileImage(data.profileImage);
@@ -38,7 +77,6 @@ function MyPage() {
         }
     };
 
-    // Fetch user plans
     const fetchUserPlans = async () => {
         try {
             const response = await apiClient.get('/plans/myPlans', {
@@ -53,7 +91,6 @@ function MyPage() {
         }
     };
 
-    // Fetch user posts
     const fetchUserPosts = async () => {
         try {
             const response = await apiClient.get(`/users/myPosts`, {
@@ -79,30 +116,57 @@ function MyPage() {
         if (file) {
             setProfileImage(file);
             setProfileImagePreview(URL.createObjectURL(file)); // Instant preview
+            setIsImageChanged(true); // Mark image as changed
         }
     };
 
     const handleSaveChanges = async () => {
-        if (profileImage) {
-            try {
+        try {
+            // 먼저 프로필 정보를 업데이트
+            const payload = {
+                nickname: nickname,
+                bio: bio,
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword,
+            };
+
+            const profileResponse = await apiClient.patch(`/users/${userId}`, payload, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${localStorage.getItem('authToken')}`,
+                },
+            });
+
+            const { data } = profileResponse.data;
+            setNickname(data.nickname);
+            setBio(data.bio);
+
+            // 만약 프로필 이미지가 선택된 경우에만 업로드 처리
+            if (isImageChanged) {
                 const formData = new FormData();
                 formData.append('images', profileImage); // Match with backend @RequestPart("images")
 
-                const response = await apiClient.post(`/users/myPage/profile-image`, formData, {
+                const imageResponse = await apiClient.post(`/users/myPage/profile-image`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `${localStorage.getItem('authToken')}`
                     },
                 });
 
-                const { profileImage: newProfileImage } = response.data.data;
+                const { profileImage: newProfileImage } = imageResponse.data.data;
                 setProfileImage(newProfileImage);
-                setProfileImagePreview(`http://localhost:8080/images/${newProfileImage}`);
-                setShowModal(false);
-                window.alert('프로필 이미지가 성공적으로 업데이트되었습니다.');
-            } catch (error) {
-                console.error('Error uploading profile image:', error);
-                window.alert('프로필 이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+                setProfileImagePreview(`https://api.restplaceforj.com/images/${newProfileImage}`);
+            }
+
+            setShowProfileModal(false);
+            window.alert('프로필이 성공적으로 업데이트되었습니다.');
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            if (error.response && error.response.data && error.response.data.message) {
+                window.alert(`프로필 업데이트에 실패했습니다: ${error.response.data.message}`);
+            } else {
+                window.alert('프로필 업데이트에 실패했습니다. 다시 시도해주세요.');
             }
         }
     };
@@ -112,7 +176,6 @@ function MyPage() {
 
         if (password) {
             try {
-                // Await the API call to ensure the frontend waits for the backend to complete
                 const response = await apiClient.delete('/users', {
                     headers: {
                         Authorization: `${localStorage.getItem('authToken')}`,
@@ -121,19 +184,14 @@ function MyPage() {
                     data: { password }
                 });
 
-                // Check if the status code indicates success
                 if (response.status === 200) {
-                    // Wait until backend processing is done before proceeding
                     localStorage.removeItem('authToken');
                     window.alert('계정이 성공적으로 탈퇴되었습니다.');
-                    // window.location.href = '/home';  // Redirect after successful deletion
                 } else {
-                    // Handle unexpected statuses
                     console.error('Unexpected response status:', response.status);
                     window.alert('계정 탈퇴에 실패했습니다. 다시 시도해주세요.');
                 }
             } catch (error) {
-                // Enhanced error handling to catch issues in backend processing
                 console.error('Error deleting account:', error);
                 if (error.response && error.response.status === 401) {
                     window.alert('비밀번호가 올바르지 않습니다.');
@@ -146,23 +204,12 @@ function MyPage() {
         }
     };
 
-
-    const handleAddPlan = () => {
-        setIsAddingPlan(true);
+    const handleAddPost = () => {
+        navigate('/posting');  // 사용자를 /posting 경로로 이동시킵니다.
     };
 
-    const handleSaveNewPlan = () => {
-        if (newPlanTitle.trim() !== '') {
-            setPlans([...plans, { id: plans.length + 1, title: newPlanTitle }]);
-            setNewPlanTitle('');
-            setIsAddingPlan(false);
-        }
-    };
-
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            handleSaveNewPlan();
-        }
+    const handlePostClick = (post) => {
+        navigate(`/posts/${post.id}`);
     };
 
     return (
@@ -179,52 +226,77 @@ function MyPage() {
                     <h2 className="nickname">{nickname}</h2>
                     <p className="bio">{bio}</p>
                     <div className="profile-actions">
-                        <button className="btn" onClick={() => setShowModal(true)}>프로필 수정</button>
+                        <button className="btn" onClick={() => setShowProfileModal(true)}>프로필 수정</button>
                         <button className="btn" onClick={handleDeleteAccount}>회원 탈퇴</button>
                     </div>
                 </div>
             </div>
+
             <div className="plans-section">
                 <h3>나의 플랜</h3>
-                {plans.map((plan) => (
-                    <div key={plan.id} className="plan-item">
-                        {plan.title}
-                    </div>
-                ))}
-                {isAddingPlan && (
-                    <div className="plan-item">
-                        <input
-                            type="text"
-                            placeholder="플랜 타이틀"
-                            value={newPlanTitle}
-                            onChange={(e) => setNewPlanTitle(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            autoFocus
-                        />
-                    </div>
-                )}
-                {!isAddingPlan && (
-                    <div className="add-button" onClick={handleAddPlan}>+</div>
-                )}
+                <div className="plans-list">
+                    {plans.length > 0 ? (
+                        plans.map((plan) => (
+                            <div
+                                key={plan.id}
+                                className="plan-item"
+                                onClick={() => navigate(`/plan/${plan.id}`, { state: { plan } })}
+                            >
+                                {plan.title}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="no-plans">아직 계획이 없습니다.</p>
+                    )}
+                    <div className="add-button" onClick={() => setShowPlanModal(true)}>+</div>
+                </div>
+
+                <Modal show={showPlanModal} onHide={() => setShowPlanModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>새 플랜 추가</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group>
+                                <Form.Label>플랜 제목</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={newPlanTitle}
+                                    onChange={(e) => setNewPlanTitle(e.target.value)}
+                                    placeholder="플랜 제목을 입력하세요"
+                                />
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowPlanModal(false)}>취소</Button>
+                        <Button variant="primary" onClick={handleCreatePlan}>저장</Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
+
             <div className="posts-section">
                 <h3>내가 작성한 추천 글</h3>
                 {posts.length > 0 ? (
                     posts.map((post) => (
-                        <div key={post.id} className="post-item">
+                        <div
+                            key={post.id}
+                            className="post-item"
+                            onClick={() => handlePostClick(post)}
+                        >
                             {post.title}
                         </div>
                     ))
                 ) : (
                     <p>게시물이 없습니다.</p>
                 )}
-                <div className="add-button">+</div>
+                <div className="add-button" onClick={handleAddPost}>+</div>
             </div>
 
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)}>
                 <Modal.Header>
-                    <Modal.Title>프로필 수정 모달창</Modal.Title>
-                    <Button variant="light" onClick={() => setShowModal(false)}>
+                    <Modal.Title>프로필 수정</Modal.Title>
+                    <Button variant="light" onClick={() => setShowProfileModal(false)}>
                         <FaTimes />
                     </Button>
                 </Modal.Header>
@@ -238,7 +310,12 @@ function MyPage() {
                             )}
                             <label className="upload-button">
                                 <FaPlus />
-                                <input type="file" accept="image/*" onChange={handleProfileImageChange} style={{ display: 'none' }} />
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleProfileImageChange}
+                                    style={{ display: 'none' }}
+                                />
                             </label>
                         </div>
                         <div className="modal-profile-info">
@@ -277,7 +354,7 @@ function MyPage() {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={handleSaveChanges}>
-                        <FaCheck/>
+                        <FaCheck />
                     </Button>
                 </Modal.Footer>
             </Modal>

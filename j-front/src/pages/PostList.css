@@ -1,0 +1,44 @@
+.post-list-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.region-selection,
+.theme-selection {
+  margin-bottom: 20px;
+}
+
+.search-button {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.search-results,
+.place-posts {
+  margin-top: 20px;
+}
+
+.place-link {
+  font-size: 1.2rem;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.sort-select,
+.search-input {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.place-link:hover,
+.post-item:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}

@@ -3,14 +3,15 @@ import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
-import { toast, ToastContainer } from 'react-toastify'; // Import toast and ToastContainer from react-toastify
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './Login.css';
 
 const Login = ({ toggle }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Create a navigate function
+  const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -25,28 +26,28 @@ const Login = ({ toggle }) => {
       });
 
       if (response.ok) {
-        // Log all response headers
-        console.log('Response headers:', [...response.headers]);
-
-        // Get the token from the headers
         const token = response.headers.get('Authorization');
 
         if (token) {
-          console.log('Token found:', token);
-
-          // Store the token in localStorage
-          localStorage.setItem('authToken', token);
-
-          // Redirect to the home page
-          navigate('/'); // Use navigate from react-router-dom
-          toast.success('Login successful!');
+          const rToken = response.headers.get('RefreshToken');
+          if (rToken) {
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('RefreshToken', rToken);
+            navigate('/');
+            toast.success('Login successful!');
+          } else {
+            console.error('RefreshToken not found in response headers');
+            toast.error('Token not found');
+          }
         } else {
-          console.error('Token not found in response headers');
-          toast.error('Token not found');
+          const errorData = await response.json();
+          console.error('Failed to sign in:', errorData.message);
+          toast.error(`Failed to sign in: ${errorData.message}`);
         }
       } else {
-        console.error('Failed to sign in:', response.statusText);
-        toast.error('Failed to sign in');
+        const errorData = await response.json();
+        console.error('Failed to sign in:', errorData.message);
+        toast.error(`Failed to sign in: ${errorData.message}`);
       }
     } catch (error) {
       console.error('Error during sign in:', error);
@@ -54,36 +55,48 @@ const Login = ({ toggle }) => {
     }
   };
 
+  const handleKakaoLogin = () => {
+    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=6f65bf43b64eb76a47ee7c87702d19b2&redirect_uri=https://restplaceforj.com/oauth/kakao/callback&response_type=code';
+  };
+
   return (
       <>
-        <Form onSubmit={handleSignIn}> {/* Add onSubmit handler to the Form */}
-          <Form.Group className="mb-3" controlId="formGroupEmail">
-            <Form.Group as={Col} controlId="formEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-              />
-            </Form.Group>
-            <Form.Group as={Col} controlId="formPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                  type="password"
-                  placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-              />
-            </Form.Group>
-          </Form.Group>
-          <Button variant="primary" type="submit">
-            로그인
-          </Button>
-        </Form>
-        <ToastContainer /> {/* Add ToastContainer to your component tree */}
+        <div className="login-container">
+          <div className="left-panel">
+            <h2>&#39;J의 안식처&#39;에 오신걸 환영해요!</h2>
+          </div>
+          <div className="right-panel">
+            <Form onSubmit={handleSignIn}>
+              <Form.Group className="mb-3" controlId="formGroupEmail">
+                <Form.Group as={Col} controlId="formEmail">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                      type="email"
+                      placeholder="이메일"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                  />
+                </Form.Group>
+                <Form.Group as={Col} controlId="formPassword">
+                  <Form.Label>Password</Form.Label>
+                  <Form.Control
+                      type="password"
+                      placeholder="패스워드"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                  />
+                </Form.Group>
+              </Form.Group>
+              <Button variant="success" type="submit" className="login-button">
+                로그인
+              </Button>
+              <Button className="kakao-login-button mt-3" onClick={handleKakaoLogin}> 카카오 로그인 </Button>
+            </Form>
+          </div>
+        </div>
+        <ToastContainer />
       </>
   );
 };
