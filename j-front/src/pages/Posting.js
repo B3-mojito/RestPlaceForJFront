@@ -227,7 +227,7 @@ function Posting() {
           <div>
             <input
                 type="text"
-                placeholder="Search for places"
+                placeholder="장소를 검색하세요!"
                 onChange={handleSearchChange}
             />
             <ul>
@@ -240,7 +240,7 @@ function Posting() {
           </div>
 
           <div className="mb-3">
-            <FloatingLabel controlId="floatingPlaceName" label="Place Name">
+            <FloatingLabel controlId="floatingPlaceName" label="장소명">
               <Form.Control
                   type="text"
                   value={postDetails.placeName}
@@ -254,7 +254,7 @@ function Posting() {
           </div>
 
           <div className="mb-3">
-            <FloatingLabel controlId="floatingAddress" label="Address">
+            <FloatingLabel controlId="floatingAddress" label="주소">
               <Form.Control
                   type="text"
                   value={postDetails.address}
@@ -308,7 +308,7 @@ function Posting() {
 
           <div className="mb-3">
             <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>프로필 이미지 업로드</Form.Label>
+              <Form.Label>이미지 업로드</Form.Label>
               <Form.Control type="file" onChange={handleImageChange} />
             </Form.Group>
             {previewImage && (
