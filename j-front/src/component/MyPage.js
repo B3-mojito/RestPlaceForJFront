@@ -156,7 +156,7 @@ function MyPage() {
 
                 const { profileImage: newProfileImage } = imageResponse.data.data;
                 setProfileImage(newProfileImage);
-                setProfileImagePreview(`http://localhost:8080/images/${newProfileImage}`);
+                setProfileImagePreview(`https://api.restplaceforj.com/images/${newProfileImage}`);
             }
 
             setShowProfileModal(false);

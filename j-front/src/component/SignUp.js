@@ -17,7 +17,7 @@ const SignUp = ({ toggle }) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8080/v1/users', {
+      const response = await axios.post('https://api.restplaceforj.com/v1/users', {
         email,
         password,
         name,
