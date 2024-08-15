@@ -17,7 +17,7 @@ const Login = ({ toggle }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8080/v1/users/login', {
+      const response = await fetch('https://api.restplaceforj.com/v1/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const Login = ({ toggle }) => {
   };
 
   const handleKakaoLogin = () => {
-    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=6f65bf43b64eb76a47ee7c87702d19b2&redirect_uri=http://localhost:3000/oauth/kakao/callback&response_type=code';
+    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=6f65bf43b64eb76a47ee7c87702d19b2&redirect_uri=https://restplaceforj.com/oauth/kakao/callback&response_type=code';
   };
 
   return (

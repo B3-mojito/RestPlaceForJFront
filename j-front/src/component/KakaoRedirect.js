@@ -9,7 +9,7 @@ const LoginHandler = () => {
   const kakaoLogin = async () => {
     try {
       const response = await axios.get(
-          `http://localhost:8080/v1/users/kakao/callback?code=${code}`, {
+          `https://api.restplaceforj.com/v1/users/kakao/callback?code=${code}`, {
             withCredentials: true,  // 필요한 경우 쿠키를 포함하여 요청
           });
 
