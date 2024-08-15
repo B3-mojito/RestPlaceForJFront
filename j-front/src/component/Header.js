@@ -21,7 +21,7 @@ function Header() {
     try {
       const response = await apiClient.get('/users/myPage', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json',
         },
       });
