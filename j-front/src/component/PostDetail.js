@@ -516,9 +516,9 @@ const PostDetail = () => {
           <button
               onClick={handlePostLike}
               style={{
-                border: '2px solid #ccc',
-                borderRadius: '15px',
                 padding: '10px 20px',
+                borderRadius: '15px',
+                border: '2px solid #ccc',
                 backgroundColor: 'transparent',
                 cursor: 'pointer',
                 display: 'flex',
@@ -649,74 +649,124 @@ const PostDetail = () => {
             onRequestClose={closeModal}
             contentLabel="추가 계획 모달"
             ariaHideApp={false}
-            style={{ content: { zIndex: 1000 } }}
+            style={{
+              content: {
+                zIndex: 1000,
+                width: '500px',
+                margin: '0 auto',
+                padding: '20px',
+                borderRadius: '10px',
+                border: '1px solid #ccc',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+              }
+            }}
         >
-          <h2>카드로 추가 모달창</h2>
+          <h2 style={{ textAlign: 'center' }}>카드로 추가 하기</h2>
+          <p style={{ textAlign: 'center' }}>이 게시물에 태그된 장소를 여행 계획에 추가하세요!</p>
+
           <form onSubmit={handleAddCardToPlan}>
-            <label htmlFor="plan">추가할 플랜을 선택하세요</label>
-            <select
-                id="plan"
-                value={selectedPlanId}
-                onChange={handlePlanChange}
-                required
-            >
-              <option value="">플랜을 선택하세요</option>
-              {plans.map((plan) => (
-                  <option key={plan.id} value={plan.id}>
-                    {plan.title}
-                  </option>
-              ))}
-            </select>
+            <div style={{ marginBottom: '20px' }}>
+              <h4>추가할 플랜을 선택하세요!</h4>
+              <label htmlFor="plan"></label>
+              <select
+                  id="plan"
+                  value={selectedPlanId}
+                  onChange={handlePlanChange}
+                  required
+                  style={{ width: '100%', padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+              >
+                <option value="">플랜을 선택하세요</option>
+                {plans.map(plan => (
+                    <option key={plan.id} value={plan.id}>{plan.title}</option>
+                ))}
+              </select>
+            </div>
 
             {cards.length > 0 && (
-                <>
-                  <label htmlFor="card">추가할 카드를 선택하세요</label>
+                <div style={{ marginBottom: '20px' }}>
+                  <h4>추가할 카드를 선택하세요!</h4>
+                  <label htmlFor="card"></label>
                   <select
                       id="card"
                       value={selectedCardId}
                       onChange={handleCardChange}
+                      style={{ width: '100%', padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
                   >
                     <option value="">카드를 선택하세요</option>
-                    {cards.map((card) => (
-                        <option key={card.id} value={card.id}>
-                          {card.title}
-                        </option>
+                    {cards.map(card => (
+                        <option key={card.id} value={card.id}>{card.title}</option>
                     ))}
                   </select>
-                </>
+                </div>
             )}
 
-            <label htmlFor="startTime">시작시간</label>
-            <input
-                type="time"
-                id="startTime"
-                value={startedAt}
-                onChange={(e) => setStartedAt(e.target.value)}
-                required
-            />
+            <div style={{ marginBottom: '20px' }}>
+              <h4>일정을 시작할 시간을 설정해주세요</h4>
+              <label htmlFor="startTime"></label>
+              <input
+                  type="time"
+                  id="startTime"
+                  value={startedAt}
+                  onChange={(e) => setStartedAt(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+              />
+            </div>
 
-            <label htmlFor="endTime">종료시간</label>
-            <input
-                type="time"
-                id="endTime"
-                value={endedAt}
-                onChange={(e) => setEndedAt(e.target.value)}
-                required
-            />
+            <div style={{ marginBottom: '20px' }}>
+              <h4>일정을 마무리할 시간을 설정해주세요</h4>
+              <label htmlFor="endTime"></label>
+              <input
+                  type="time"
+                  id="endTime"
+                  value={endedAt}
+                  onChange={(e) => setEndedAt(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+              />
+            </div>
 
-            <label htmlFor="memo">메모를 입력하세요</label>
-            <textarea
-                id="memo"
-                value={memo}
-                onChange={(e) => setMemo(e.target.value)}
-            ></textarea>
+            <div style={{ marginBottom: '20px' }}>
+              <h4>일정과 관련된 메모를 입력해주세요</h4>
+              <label htmlFor="memo"></label>
+              <textarea
+                  id="memo"
+                  value={memo}
+                  onChange={(e) => setMemo(e.target.value)}
+                  style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc', resize: 'none' }}
+              ></textarea>
+            </div>
 
-            <button type="submit">확인</button>
-            <button type="button" onClick={closeModal}>
-              취소
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+              <button
+                  type="submit"
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '15px',
+                    border: '2px solid #ccc',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                  }}
+              >
+                확인
+              </button>
+              <button
+                  type="button"
+                  onClick={closeModal}
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '15px',
+                    border: '2px solid #ccc',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                  }}
+              >
+                취소
+              </button>
+            </div>
           </form>
         </Modal>
+
       </div>
   );
 };
