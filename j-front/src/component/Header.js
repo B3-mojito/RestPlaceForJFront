@@ -34,7 +34,7 @@ function Header() {
   const handleLogout = () => {
     // Remove tokens from local storage
     localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('RefreshToken');
     setIsAuthenticated(false);
     // Redirect to the home page after logging out
     window.location.href = '/';
