@@ -24,7 +24,7 @@ const LoginHandler = () => {
         localStorage.setItem("authToken", accessToken);
       }
       if (refreshToken) {
-        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("RefreshToken", refreshToken);
       }
 
       // 로그인이 성공하면 이동할 페이지로 리디렉트

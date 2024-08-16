@@ -36,7 +36,7 @@ const Login = ({ toggle }) => {
             navigate('/');
             toast.success('Login successful!');
           } else {
-            console.error('RefreshToken not found in response headers');
+            console.error('refreshToken not found in response headers');
             toast.error('Token not found');
           }
         } else {
