@@ -30,7 +30,7 @@ function EditPost() {
       try {
         const response = await apiClient.get('/users/me', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            Authorization: `${localStorage.getItem('authToken')}`,
             'Content-Type': 'application/json'
           }
         });
@@ -50,7 +50,7 @@ function EditPost() {
       try {
         const response = await apiClient.get(`/posts/${postId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            Authorization: `${localStorage.getItem('authToken')}`,
             'Content-Type': 'application/json'
           }
         });
@@ -165,7 +165,7 @@ function EditPost() {
 
         const imageResponse = await apiClient.post('/images', imageData, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            Authorization: `${localStorage.getItem('authToken')}`,
             'Content-Type': 'multipart/form-data'
           }
         });
@@ -187,7 +187,7 @@ function EditPost() {
 
       const postResponse = await apiClient.patch(`/posts/${postId}`, postPayload, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          Authorization: `${localStorage.getItem('authToken')}`
         }
       });
 
