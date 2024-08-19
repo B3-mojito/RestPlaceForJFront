@@ -531,6 +531,7 @@ const PostDetail = () => {
           >
             ❤️
           </button>
+          <p>{post.likesCount}</p>
         </div>
 
         <div style={{ marginTop: '40px' }}>
