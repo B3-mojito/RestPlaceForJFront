@@ -253,11 +253,11 @@ function MyPage() {
     return (
         <div className="my-page-container">
             <div className="profile-section">
-                <div className="profile-image">
+                <div className="profile-image" onClick={() => document.getElementById('profileImageInput').click()}>
                     {profileImagePreview ? (
-                        <img src={profileImagePreview} alt="Profile" onClick={() => document.getElementById('profileImageInput').click()} />
+                        <img src={profileImagePreview} alt="Profile" />
                     ) : (
-                        <div>{'{path}'}</div>
+                      <></>
                     )}
                     <input
                         type="file"
@@ -266,12 +266,12 @@ function MyPage() {
                         onChange={handleProfileImageChange}
                         style={{ display: 'none' }}
                     />
-                    {isImageChanged && (
-                        <Button variant="primary" onClick={handleSaveImage}>
-                            저장
-                        </Button>
-                    )}
                 </div>
+                {isImageChanged && (
+                    <Button variant="primary" onClick={handleSaveImage}>
+                        저장
+                    </Button>
+                )}
                 <div className="profile-info">
                     <h2 className="nickname">{nickname}</h2>
                     <p className="bio">{bio}</p>
