@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import './MyPage.css';
-import {Button, Form, Modal} from 'react-bootstrap';
-import {FaCheck, FaTimes} from 'react-icons/fa';
+import { Modal, Button, Form } from 'react-bootstrap';
+import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
 import apiClient from "../helpers/apiClient";
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function MyPage() {
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -70,7 +70,7 @@ function MyPage() {
           Authorization: `${localStorage.getItem('authToken')}`
         }
       });
-      const {data} = response.data;
+      const { data } = response.data;
       setUserId(data.userId);
       setNickname(data.nickname);
       setBio(data.bio);
@@ -88,20 +88,18 @@ function MyPage() {
         confirmPassword: confirmPassword,
       };
 
-      const response = await apiClient.patch(`/users/${userId}/password`,
-          payload, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `${localStorage.getItem('authToken')}`,
-            },
-          });
+      const response = await apiClient.patch(`/users/${userId}/password`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${localStorage.getItem('authToken')}`,
+        },
+      });
 
       window.alert('비밀번호가 성공적으로 변경되었습니다.');
       setShowPasswordModal(false);
     } catch (error) {
       console.error('Error updating password:', error);
-      if (error.response && error.response.data
-          && error.response.data.message) {
+      if (error.response && error.response.data && error.response.data.message) {
         window.alert(`비밀번호 변경에 실패했습니다: ${error.response.data.message}`);
       } else {
         window.alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
@@ -116,7 +114,7 @@ function MyPage() {
           Authorization: `${localStorage.getItem('authToken')}`
         }
       });
-      const {data} = response.data;
+      const { data } = response.data;
       setPlans(data);
     } catch (error) {
       console.error('Error fetching user plans:', error);
@@ -159,18 +157,16 @@ function MyPage() {
         const formData = new FormData();
         formData.append('images', profileImage); // Match with backend @RequestPart("images")
 
-        const imageResponse = await apiClient.post(
-            `/users/myPage/profile-image`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `${localStorage.getItem('authToken')}`
-              },
-            });
+        const imageResponse = await apiClient.post(`/users/myPage/profile-image`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `${localStorage.getItem('authToken')}`
+          },
+        });
 
-        const {profileImage: newProfileImage} = imageResponse.data.data;
+        const { profileImage: newProfileImage } = imageResponse.data.data;
         setProfileImage(newProfileImage);
-        setProfileImagePreview(
-            `https://api.restplaceforj.com/images/${newProfileImage}`);
+        setProfileImagePreview(`https://api.restplaceforj.com/images/${newProfileImage}`);
         window.alert('프로필 이미지가 성공적으로 업데이트되었습니다.');
         setIsImageChanged(false);
         window.location.reload();
@@ -191,15 +187,14 @@ function MyPage() {
         confirmPassword: confirmPassword,
       };
 
-      const profileResponse = await apiClient.patch(`/users/${userId}`, payload,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `${localStorage.getItem('authToken')}`,
-            },
-          });
+      const profileResponse = await apiClient.patch(`/users/${userId}`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${localStorage.getItem('authToken')}`,
+        },
+      });
 
-      const {data} = profileResponse.data;
+      const { data } = profileResponse.data;
       setNickname(data.nickname);
       setBio(data.bio);
 
@@ -207,8 +202,7 @@ function MyPage() {
       window.alert('프로필이 성공적으로 업데이트되었습니다.');
     } catch (error) {
       console.error('Error updating profile:', error);
-      if (error.response && error.response.data
-          && error.response.data.message) {
+      if (error.response && error.response.data && error.response.data.message) {
         window.alert(`프로필 업데이트에 실패했습니다: ${error.response.data.message}`);
       } else {
         window.alert('프로필 업데이트에 실패했습니다. 다시 시도해주세요.');
@@ -226,7 +220,7 @@ function MyPage() {
             Authorization: `${localStorage.getItem('authToken')}`,
             'Content-Type': 'application/json'
           },
-          data: {password}
+          data: { password }
         });
 
         if (response.status === 200) {
@@ -274,27 +268,25 @@ function MyPage() {
   return (
       <div className="my-page-container">
         <div className="profile-section">
-          <div className="profile-image">
+          <div className="profile-image" onClick={() => document.getElementById('profileImageInput').click()}>
             {profileImagePreview ? (
-                <img src={profileImagePreview} alt="Profile"
-                     onClick={() => document.getElementById(
-                         'profileImageInput').click()}/>
+                <img src={profileImagePreview} alt="Profile" />
             ) : (
-                <div>{'{path}'}</div>
+                <></>
             )}
             <input
                 type="file"
                 id="profileImageInput"
                 accept="image/*"
                 onChange={handleProfileImageChange}
-                style={{display: 'none'}}
+                style={{ display: 'none' }}
             />
-            {isImageChanged && (
-                <Button variant="primary" onClick={handleSaveImage}>
-                  저장
-                </Button>
-            )}
           </div>
+          {isImageChanged && (
+              <Button variant="primary" onClick={handleSaveImage}>
+                저장
+              </Button>
+          )}
           <div className="profile-info">
             <h2 className="nickname">{nickname}</h2>
             <p className="bio">{bio}</p>
@@ -321,8 +313,7 @@ function MyPage() {
                     <div
                         key={plan.id}
                         className="plan-item"
-                        onClick={() => navigate(`/plan/${plan.id}`,
-                            {state: {plan}})}
+                        onClick={() => navigate(`/plan/${plan.id}`, { state: { plan } })}
                     >
                       {plan.title}
                     </div>
@@ -330,9 +321,7 @@ function MyPage() {
             ) : (
                 <p className="no-plans">아직 계획이 없습니다.</p>
             )}
-            <div className="add-button"
-                 onClick={() => setShowPlanModal(true)}>+
-            </div>
+            <div className="add-button" onClick={() => setShowPlanModal(true)}>+</div>
           </div>
 
           <Modal show={showPlanModal} onHide={() => setShowPlanModal(false)}>
@@ -353,8 +342,7 @@ function MyPage() {
               </Form>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary"
-                      onClick={() => setShowPlanModal(false)}>취소</Button>
+              <Button variant="secondary" onClick={() => setShowPlanModal(false)}>취소</Button>
               <Button variant="primary" onClick={handleCreatePlan}>저장</Button>
             </Modal.Footer>
           </Modal>
@@ -429,12 +417,11 @@ function MyPage() {
             </Button>
           </Modal.Footer>
         </Modal>
-        <Modal show={showPasswordModal}
-               onHide={() => setShowPasswordModal(false)}>
+        <Modal show={showPasswordModal} onHide={() => setShowPasswordModal(false)}>
           <Modal.Header>
             <Modal.Title>비밀번호 변경</Modal.Title>
             <Button variant="light" onClick={() => setShowPasswordModal(false)}>
-              <FaTimes/>
+              <FaTimes />
             </Button>
           </Modal.Header>
           <Modal.Body>
@@ -463,7 +450,7 @@ function MyPage() {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={handleSavePasswordChanges}>
-              <FaCheck/>
+              <FaCheck />
             </Button>
           </Modal.Footer>
         </Modal>
