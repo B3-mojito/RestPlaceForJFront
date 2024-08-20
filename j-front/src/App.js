@@ -15,11 +15,13 @@ import PostDetail from "./component/PostDetail";
 import EditPost from "./component/EidtPost";
 import Footer from './component/Footer';
 import LoginHandler from "./component/KakaoRedirect";
+import {AuthProvider} from "./context/AuthProvider";
 
 const Login = lazy(() => import('./component/Login'));
 const Home = lazy(() => import('./pages/Home'));
 
 function App() {
+
     const [showSignUp, setShowSignUp] = useState(true);
 
     // Define the toggle function
@@ -27,6 +29,7 @@ function App() {
         setShowSignUp(!showSignUp);
     };
     return (
+        <AuthProvider>
         <Router>
             <Header />
             <Suspense fallback={<div>Loading...</div>}>
@@ -49,6 +52,7 @@ function App() {
             </Suspense>
             <Footer />
         </Router>
+        </AuthProvider>
     );
 }
 

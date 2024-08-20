@@ -1,34 +1,35 @@
-import React, {createContext, useState, useContext, useEffect} from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import PropTypes from "prop-types";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
 
 export const AuthProvider = ({ children }) => {
-  const [authToken, setAuthToken] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('authToken'));
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    // Check for token in localStorage on initial load
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      setAuthToken(token);
-    }
-  }, []);
-
-
-  const login = (token) => {
-    localStorage.setItem('jwtToken', token);
+  const login = (userData) => {
+    setIsAuthenticated(true);
+    setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('RefreshToken');
+    setIsAuthenticated(false);
+    setUser(null);
   };
 
   return (
-      <AuthContext.Provider value={{ authToken, login, logout }}>
+      <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
         {children}
       </AuthContext.Provider>
   );
 };
+
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired, // Validate that children is a React node and required
 };
