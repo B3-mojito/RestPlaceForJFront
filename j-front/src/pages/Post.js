@@ -27,7 +27,7 @@ function PostList() {
     { value: "FOOD_TOUR", label: "먹고 싶어요" },
     { value: "SHOPPING", label: "쇼핑하고 싶어요" },
     { value: "CULTURAL", label: "문화생활 하고 싶어요" },
-    { value: "MARKET", label: "마트에 가고 싶어요" },
+    { value: "MARKET", label: "시장에 가고 싶어요" },
     { value: "NATURE", label: "자연을 느끼고 싶어요" },
     { value: "EXPERIENCE", label: "체험해보고 싶어요" }
   ];
@@ -48,12 +48,12 @@ function PostList() {
         setPlaces(contentList);
         setTotalPages(totalPages);
       } else {
-        console.error('Expected data object but received:', result);
+        console.error('검색에 실패하였습니다.:', result);
         setPlaces([]);
         setTotalPages(0);
       }
     } catch (error) {
-      console.error('Error fetching places:', error);
+      console.error(`검색에 실패하였습니다. 다시 시도해주세요.: ${error.response.data.message}`);
       setPlaces([]);
       setTotalPages(0);
     }
@@ -75,12 +75,12 @@ function PostList() {
         setPosts(contentList);
         setTotalPages(totalPages);
       } else {
-        console.error('Expected data object but received:', result);
+        console.error(`검색에 실패했습니다.:`, result);
         setPosts([]);
         setTotalPages(0);
       }
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error(`검색에 실패했습니다. 다시 시도해주세요: ${error.response.data.message}`);
       setPosts([]);
       setTotalPages(0);
     }
