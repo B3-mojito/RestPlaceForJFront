@@ -128,6 +128,32 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
     marginRight: '10px',
+  },
+  searchResultList: {
+    listStyleType: 'none',
+    padding: 0,
+    margin: 0,
+    borderRadius: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    marginTop: '10px',
+    maxHeight: '200px', // Limit the height of the list for better UI
+    overflowY: 'auto', // Add a scroll if there are too many items
+  },
+  searchResultItem: {
+    padding: '10px 15px',
+    borderBottom: '1px solid #ddd',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease, color 0.2s ease',
+  },
+  searchResultItemHover: {
+    backgroundColor: '#f0f8ff',
+    color: '#007bff',
+  },
+  // Customize the pointer style
+  pointer: {
+    cursor: 'pointer',
   }
 };
 
@@ -140,6 +166,7 @@ function Plan() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingCardId, setEditingCardId] = useState(null);
   const [newColumnDate, setNewColumnDate] = useState('');
+  const [hoveredItemId, setHoveredItemId] = useState(null);
   const [cardDetails, setCardDetails] = useState({
     title: '',
     address: '',
@@ -179,7 +206,7 @@ function Plan() {
       });
       setColumns(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch columns:', error);
+      console.error('Failed to fetch columns:', error.response.data.message);
     }
   };
 
@@ -192,7 +219,7 @@ function Plan() {
       });
       setCoworkers(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch coworkers:', error);
+      console.error('Failed to fetch coworkers:', error.response.data.message);
     }
   };
 
@@ -211,7 +238,7 @@ function Plan() {
       setEditModalVisible(false);
       fetchColumns2();
     } catch (error) {
-      console.error('Failed to update column:', error);
+      console.error('Failed to update column:', error.response.data.message);
     }
   };
 
@@ -245,7 +272,7 @@ function Plan() {
   }, [mapsLoaded]);
 
   const loadKakaoMapsScript = () => {
-    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=f90abf763c49b09ee81cd9b1f5f0b3ef&libraries=services,clusterer,drawing&autoload=false"
+    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=1b3fb716f9111507c799266af6e4a45b&libraries=services,clusterer,drawing&autoload=false"
     if (window.kakao && window.kakao.maps) {
       setMapsLoaded(true);
       return;
@@ -273,15 +300,21 @@ function Plan() {
 
   const initializeMap = () => {
     const mapContainer = mapContainerRef.current;
+    const southKoreaBounds = new window.kakao.maps.LatLngBounds(
+        new window.kakao.maps.LatLng(33.0, 124.0), // Southwest corner (Jeju Island area)
+        new window.kakao.maps.LatLng(38.5, 132.0)  // Northeast corner (near Ulleungdo)
+    );
     const mapOptions = {
-      center: new window.kakao.maps.LatLng(37.5665, 126.978),
-      level: 3
+      center: new window.kakao.maps.LatLng(37.5665, 126.978), // Center the map on Seoul
+      level: 3, // Zoom level (adjust as needed)
+      maxLevel: 10 // Restrict max zoom out level to avoid seeing North Korea
     };
 
     const map = new window.kakao.maps.Map(mapContainer, mapOptions);
     const ps = new window.kakao.maps.services.Places();
     const geocoder = new window.kakao.maps.services.Geocoder();
 
+    map.setBounds(southKoreaBounds); // Set the maximum bounds to the defined area
     const searchPlaces = (query) => {
       ps.keywordSearch(query, (data, status) => {
         if (status === window.kakao.maps.services.Status.OK) {
@@ -306,16 +339,12 @@ function Plan() {
       const lat = latlng.getLat();
       const lng = latlng.getLng();
 
-      geocoder.coord2RegionCode(lng, lat, (result, status) => {
+      geocoder.coord2Address(lng, lat, (result, status) => {
         if (status === window.kakao.maps.services.Status.OK) {
-          const place = result[0];
-          setCardDetails(prevDetails => ({
-            ...prevDetails,
-            address: place.address_name,
-            placeName: place.place_name
-          }));
+          const address = result[0].address.address_name;
+          alert(`Latitude: ${lat}, Longitude: ${lng}, Address: ${address}`);
         } else {
-          console.error('Failed to get address from coordinates:', status);
+          alert(`Latitude: ${lat}, Longitude: ${lng}`);
         }
       });
     };
@@ -332,7 +361,7 @@ function Plan() {
       });
       setPlanTitle(response.data.data.title);
     } catch (error) {
-      console.error('Failed to fetch plan data:', error);
+      console.error('Failed to fetch plan data:', error.response.data.message);
     }
   };
 
@@ -347,7 +376,7 @@ function Plan() {
       setColumns(response.data.data);
       fetchCardsForColumns(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch columns:', error);
+      console.error('Failed to fetch columns:', error.response.data.message);
     }
   };
 
@@ -362,7 +391,7 @@ function Plan() {
         });
         cardsData[column.id] = response.data.data;
       } catch (error) {
-        console.error(`Failed to fetch cards for column ${column.id}:`, error);
+        console.error(`Failed to fetch cards for column ${column.id}:`, error.response.data.message);
       }
     }
     setCards(cardsData);
@@ -377,7 +406,7 @@ function Plan() {
       setIsEditing(false);
       await fetchPlanData();
     } catch (error) {
-      console.error('Failed to update plan title:', error);
+      console.error('Failed to update plan title:', error.response.data.message);
     }
   };
 
@@ -391,7 +420,7 @@ function Plan() {
       setNewColumnTitle('');
       setNewColumnDate('');
     } catch (error) {
-      console.error('Failed to add column:', error);
+      console.error('Failed to add column:', error.response.data.message);
     }
   };
 
@@ -407,7 +436,7 @@ function Plan() {
         console.log("플랜 삭제 완료");
         window.location.href = '/plan'; // 홈 페이지로 리다이렉트
       } catch (error) {
-        console.error('Error deleting plan:', error);
+        console.error('Error deleting plan:', error.response.data.message);
       }
     } else {
       console.log("플랜 삭제가 취소되었습니다.");
@@ -425,7 +454,7 @@ function Plan() {
         console.log("일차 삭제 완료");
         fetchColumns();
       } catch (error) {
-        console.error('Error deleting plan:', error);
+        console.error('Error deleting plan:', error.response.data.message);
       }
     } else {
       console.log("일차 삭제가 취소되었습니다.");
@@ -445,7 +474,7 @@ function Plan() {
         console.log("일정 삭제 완료");
         fetchColumns();
       } catch (error) {
-        console.error('Error deleting plan:', error);
+        console.error('Error deleting plan:', error.response.data.message);
       }
     } else {
       console.log("일정 삭제가 취소되었습니다.");
@@ -474,7 +503,7 @@ function Plan() {
       // 일정 추가 후 모달 닫기
       closeAddCardModal();
     } catch (error) {
-      console.error('Failed to add card:', error);
+      console.error('Failed to add card:', error.response.data.message);
     }
   };
 
@@ -518,7 +547,7 @@ function Plan() {
           };
         });
       } catch (error) {
-        console.error('Failed to update card column:', error);
+        console.error('Failed to update card column:', error.response.data.message);
       }
     } else {
       setCards(prevCards => {
@@ -553,12 +582,21 @@ function Plan() {
 
       setRelatedPosts(response.data.data.contentList);
     } catch (error) {
-      console.error('Failed to fetch related posts:', error);
+      console.error('Failed to fetch related posts:', error.response.data.message);
     }
   };
 
   const handleCardDetailsChange = (e) => {
     const {name, value} = e.target;
+    if (name === 'endedAt' && cardDetails.startedAt && value < cardDetails.startedAt) {
+      alert('종료 시간은 시작 시간보다 빠를 수 없습니다.'); // Show an alert or handle error as you see fit
+      return;
+    }
+
+    if (name === 'startedAt' && cardDetails.endedAt && value > cardDetails.endedAt) {
+      alert('시작 시간은 종료 시간보다 늦을 수 없습니다.');
+      return;
+    }
     setCardDetails(prevDetails => ({
       ...prevDetails,
       [name]: value
@@ -584,7 +622,7 @@ function Plan() {
       setEditingCardId(null);
       fetchColumns();
     } catch (error) {
-      console.error('Failed to update card:', error);
+      console.error('Failed to update card:', error.response.data.message);
     }
   };
 
@@ -651,7 +689,7 @@ function Plan() {
       closeInviteModal();
       alert("Invitation sent successfully!");
     } catch (error) {
-      console.error('Failed to send invitation:', error);
+      console.error('Failed to send invitation:', error.response.data.message);
     }
   };
 
@@ -694,6 +732,15 @@ function Plan() {
     handleSaveCardChanges(); // 기존의 카드 수정 함수 호출
     closeEditCardModal(); // 모달 닫기
   };
+
+  const handleMouseEnter = (placeId) => {
+    setHoveredItemId(placeId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredItemId(null);
+  };
+
 
   return (
       <div style={styles.container}>
@@ -784,14 +831,21 @@ function Plan() {
                 />
                 <input
                     type="text"
-                    placeholder="방문할 장소를 검색하세요"
+                    placeholder="방문할 장소를 검색하세요 (최소 3자이상 입력)"
                     onChange={handleSearchChange}
                     style={styles.input}
                 />
-                <ul>
+                <ul style={styles.searchResultList}>
                   {searchResults.map((place) => (
-                      <li key={place.id}
-                          onClick={() => handlePlaceSelect(place)}>
+                      <li   key={place.id}
+                            onClick={() => handlePlaceSelect(place)}
+                            onMouseEnter={() => handleMouseEnter(place.id)}
+                            onMouseLeave={handleMouseLeave}
+                            style={{
+                              ...styles.searchResultItem,
+                              ...(hoveredItemId === place.id ? styles.searchResultItemHover : {}),
+                            }}
+                      >
                         {place.place_name} ({place.address_name})
                       </li>
                   ))}

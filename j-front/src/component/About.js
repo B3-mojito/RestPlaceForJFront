@@ -12,6 +12,8 @@ function About() {
   const [plans, setPlans] = useState([]);  // Initialize as empty array
   const [posts, setPosts] = useState([]);  // Initialize as empty array
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
@@ -49,13 +51,14 @@ function About() {
   // Fetch user posts
   const fetchUserPosts = async () => {
     try {
-      const response = await apiClient.get(`/users/${userId}/posts`, {
+      const response = await apiClient.get(`/users/${userId}/posts?page=${currentPage}&size=5`, {
         headers: {
           Authorization: `${localStorage.getItem('authToken')}`
         }
       });
-      const {data} = response.data;
-      setPosts(data.contentList);
+      const { contentList, totalPages } = response.data.data;
+      setPosts(contentList);
+      setTotalPages(totalPages);
     } catch (error) {
       console.error('Error fetching user posts:', error);
     }
@@ -65,6 +68,18 @@ function About() {
     navigate(`/posts/${post.id}`);
   };
 
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   // Fetch data when userId is available
   useEffect(() => {
     if (userId) {
@@ -72,7 +87,7 @@ function About() {
       fetchUserPlans();
       fetchUserPosts();
     }
-  }, [userId]); // Depend on userId, so it runs when userId changes
+  }, [userId, currentPage]); // Depend on userId, so it runs when userId changes
 
   return (
       <div className="my-page-container">
@@ -117,6 +132,26 @@ function About() {
           ) : (
               <p>게시물이 없습니다.</p>
           )}
+          <div style={{
+            marginTop: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <button onClick={handlePreviousPage}
+                    disabled={currentPage === 0}>
+              이전
+            </button>
+            <span style={{margin: '0 10px'}}>
+              {currentPage + 1} ... {totalPages}
+            </span>
+            <button
+                onClick={handleNextPage}
+                disabled={currentPage >= totalPages - 1}
+            >
+              다음
+            </button>
+          </div>
         </div>
       </div>
   );

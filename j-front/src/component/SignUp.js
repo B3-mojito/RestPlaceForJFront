@@ -28,10 +28,10 @@ const SignUp = ({ toggle }) => {
         alert('회원가입 완료!');
         navigate('/login');
       } else {
-        alert(`Sign-up failed: ${response.data.message || response.statusText}`);
+        alert(`회원가입 실패: ${response.data.message || response.statusText}`);
       }
     } catch (error) {
-      alert('Network error occurred. Please try again later.');
+      alert('회원가입 실패 다시시도해주세요');
     }
   };
 

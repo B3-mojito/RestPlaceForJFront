@@ -1,21 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
-import apiClient from '../helpers/apiClient'; // Ensure you have an API client set up for making API calls
+import {useAuth} from "../context/AuthProvider";
+import apiClient from '../helpers/apiClient';
 
 function Header() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const { isAuthenticated, user, login, logout } = useAuth();
 
   useEffect(() => {
-    // Check if the user is authenticated by checking for a token in local storage
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      setIsAuthenticated(true);
+    if (isAuthenticated && !user) {
       fetchUserProfile();
-    } else {
-      setIsAuthenticated(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   const fetchUserProfile = async () => {
     try {
@@ -25,19 +20,10 @@ function Header() {
           'Content-Type': 'application/json',
         },
       });
-      setUser(response.data.data);
+      login(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch user profile:', error);
+      console.error(error.response.data.message);
     }
-  };
-
-  const handleLogout = () => {
-    // Remove tokens from local storage
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('RefreshToken');
-    setIsAuthenticated(false);
-    // Redirect to the home page after logging out
-    window.location.href = '/';
   };
 
   return (
@@ -73,7 +59,7 @@ function Header() {
                           </div>
                       )}
                       <Nav.Link href="/mypage">마이페이지</Nav.Link>
-                      <Nav.Link onClick={handleLogout}>로그아웃</Nav.Link>
+                      <Nav.Link onClick={logout}>로그아웃</Nav.Link>
                     </>
                 )}
               </Nav>
@@ -85,3 +71,4 @@ function Header() {
 }
 
 export default Header;
+

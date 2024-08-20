@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import apiClient from "../helpers/apiClient";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast, ToastContainer } from 'react-toastify';
+import {useNavigate, useParams} from "react-router-dom";
+import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function EditPost() {
@@ -36,7 +36,7 @@ function EditPost() {
         });
         setLoggedInUserId(response.data.data.userId);
       } catch (error) {
-        console.error('Failed to fetch logged-in user details:', error);
+        console.error(error.response.data.message);
       }
     };
 
@@ -68,11 +68,11 @@ function EditPost() {
 
         // Redirect to home if the logged-in user is not the author
         if (postData.userId !== loggedInUserId) {
-          toast.error('접근 권한이 없습니다.');
+          alert('접근 권한이 없습니다.');
           navigate('/');
         }
       } catch (error) {
-        console.error('Failed to load post details:', error);
+        console.error(error.response.data.message);
       }
     };
 
@@ -134,15 +134,15 @@ function EditPost() {
       script.onload = () => {
         window.kakao.maps.load(() => {
           setMapsLoaded(true);
-          console.log('Kakao Maps API loaded');
+          console.log('맵 로드 성공');
         });
       };
       script.onerror = () => {
-        console.error('Failed to load Kakao Maps API script');
+        console.error('맵 호출 실패');
       };
       document.body.appendChild(script);
     } else {
-      console.log('Kakao Maps API script already loaded');
+      console.log('카카오 맵이 이미 로드 되었습니다.');
     }
   };
 
@@ -192,13 +192,12 @@ function EditPost() {
       });
 
       if (postResponse.data && postResponse.data.data) {
-        toast.success('게시물이 성공적으로 수정되었습니다!', {
-          onClose: () => navigate(`/posts/${postId}`) // Redirect to the post details page
-        });
+        alert('게시물이 성공적으로 수정되었습니다!');
+        navigate(`/posts/${postId}`);
       }
     } catch (error) {
-      console.error('Failed to update post:', error);
-      toast.error('게시물 수정에 실패했습니다.');
+      console.error('Failed to update post:', error.response.data.message);
+      alert('게시물 수정에 실패했습니다.' + error.response.data.message);
     }
   };
 
@@ -214,7 +213,7 @@ function EditPost() {
 
   const handleSearch = (query) => {
     if (!mapsLoaded) {
-      console.error('Kakao Maps API is not loaded');
+      console.error('맵이 로드되지않음.');
       return;
     }
 

@@ -30,7 +30,7 @@ const LoginHandler = () => {
       // 로그인이 성공하면 이동할 페이지로 리디렉트
       navigate("/");
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("로그인 실패:", error.response.data.message);
       // 실패 시 적절한 에러 처리
     }
   };

@@ -5,6 +5,7 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
+import {useAuth} from "../context/AuthProvider";
 import 'react-toastify/dist/ReactToastify.css';
 import './Login.css';
 
@@ -12,6 +13,7 @@ const Login = ({ toggle }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -27,34 +29,27 @@ const Login = ({ toggle }) => {
 
       if (response.ok) {
         const token = response.headers.get('Authorization');
+        const rToken = response.headers.get('RefreshToken');
 
-        if (token) {
-          const rToken = response.headers.get('RefreshToken');
-          if (rToken) {
-            localStorage.setItem('authToken', token);
-            localStorage.setItem('RefreshToken', rToken);
-            navigate('/');
-            toast.success('Login successful!');
-          } else {
-            console.error('refreshToken not found in response headers');
-            toast.error('Token not found');
-          }
+        if (token && rToken) {
+          localStorage.setItem('authToken', token);
+          localStorage.setItem('RefreshToken', rToken);
+          navigate('/');
+          window.location.reload();
+          alert('로그인 성공!');
         } else {
-          const errorData = await response.json();
-          console.error('Failed to sign in:', errorData.message);
-          toast.error(`Failed to sign in: ${errorData.message}`);
+          alert('로그인 실패 : 토큰을 찾을수 없음');
         }
       } else {
         const errorData = await response.json();
-        console.error('Failed to sign in:', errorData.message);
-        toast.error(`Failed to sign in: ${errorData.message}`);
+        console.error('Failed to sign in:', errorData.message || 'Unknown error');
+        alert(`로그인 실패: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Error during sign in:', error);
-      toast.error('Error during sign in');
+      console.error('로그인 에러:', error.response.data.message);
+      alert('로그인 실패...');
     }
   };
-
   const handleKakaoLogin = () => {
     window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=6f65bf43b64eb76a47ee7c87702d19b2&redirect_uri=https://restplaceforj.com/oauth/kakao/callback&response_type=code';
   };

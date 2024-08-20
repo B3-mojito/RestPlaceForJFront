@@ -25,6 +25,8 @@ const PostDetail = () => {
 
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editCommentContent, setEditCommentContent] = useState('');
+  const [newPlanTitle, setNewPlanTitle] = useState('미정'); // New state for creating a plan
+  const [showCreatePlanModal, setShowCreatePlanModal] = useState(false); // New state to control the create plan modal visibility
 
   const navigate = useNavigate();
 
@@ -46,7 +48,7 @@ const PostDetail = () => {
       });
       setLoggedInUserId(response.data.data.userId);
     } catch (error) {
-      console.error('Error fetching logged-in user details:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -60,7 +62,7 @@ const PostDetail = () => {
       });
       setPost(response.data.data);
     } catch (error) {
-      console.error('Error fetching post details:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -74,7 +76,7 @@ const PostDetail = () => {
       });
       setPostImage(response.data.data.path);
     } catch (error) {
-      console.error('Error fetching post image:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -88,7 +90,7 @@ const PostDetail = () => {
       });
       setPlans(response.data.data);
     } catch (error) {
-      console.error('Error fetching plans:', error);
+      console.error("플랜이 존재하지 않거나"+ error.response.data.message);
     }
   };
 
@@ -102,7 +104,7 @@ const PostDetail = () => {
       });
       setCards(response.data.data);
     } catch (error) {
-      console.error('Error fetching cards:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -122,7 +124,7 @@ const PostDetail = () => {
       setComments(contentList);
       setTotalPages(totalPages);
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -139,7 +141,22 @@ const PostDetail = () => {
   const handleNewCommentChange = (e) => {
     setNewComment(e.target.value);
   };
+  const handleCreatePlan = async () => {
+    try {
+      const response = await apiClient.post('/plans', { title: newPlanTitle }, {
+        headers: {
+          Authorization: localStorage.getItem('authToken'),
+        },
+      });
 
+      setPlans([...plans, response.data.data]);
+      setShowCreatePlanModal(false);
+      setNewPlanTitle('');
+      fetchPlans(); // Refresh the plans list
+    } catch (error) {
+      console.error(error.response.data.message);
+    }
+  };
   const handleCommentSubmit = async () => {
     try {
       const response = await apiClient.post(
@@ -158,7 +175,7 @@ const PostDetail = () => {
         fetchComments();
       }
     } catch (error) {
-      console.error('Error submitting comment:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -192,7 +209,7 @@ const PostDetail = () => {
         });
         navigate('/');
       } catch (error) {
-        console.error('Error deleting the post:', error);
+        console.error('Error deleting the post:', error.response.data.message);
       }
     }
   };
@@ -214,7 +231,7 @@ const PostDetail = () => {
         fetchPost();
       }
     } catch (error) {
-      console.error('Error liking the post:', error);
+      console.error('Error liking the post:', error.response.data.message);
     }
   };
 
@@ -235,7 +252,7 @@ const PostDetail = () => {
         fetchComments();
       }
     } catch (error) {
-      console.error('Error liking the comment:', error);
+      console.error('Error liking the comment:', error.response.data.message);
     }
   };
 
@@ -277,7 +294,7 @@ const PostDetail = () => {
           closeModal();
         }
       } catch (error) {
-        console.error('Error updating card:', error);
+        console.error('Error updating card:', error.response.data.message);
       }
     } else {
       try {
@@ -296,7 +313,7 @@ const PostDetail = () => {
           closeModal();
         }
       } catch (error) {
-        console.error('Error adding card to plan:', error);
+        console.error('Error adding card to plan:', error.response.data.message);
       }
     }
   };
@@ -325,7 +342,7 @@ const PostDetail = () => {
         fetchComments();
       }
     } catch (error) {
-      console.error('Error updating comment:', error);
+      console.error('Error updating comment:', error.response.data.message);
     }
   };
 
@@ -344,7 +361,7 @@ const PostDetail = () => {
 
         fetchComments();
       } catch (error) {
-        console.error('Error deleting comment:', error);
+        console.error('Error deleting comment:', error.response.data.message);
       }
     }
   };
@@ -682,6 +699,22 @@ const PostDetail = () => {
                     <option key={plan.id} value={plan.id}>{plan.title}</option>
                 ))}
               </select>
+              <button
+                  type="button"
+                  onClick={() => setShowCreatePlanModal(true)}
+                  style={{
+                    marginTop: '10px',
+                    padding: '8px',
+                    borderRadius: '5px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    width: '100%',
+                  }}
+              >
+                새 플랜 만들기
+              </button>
             </div>
 
             {cards.length > 0 && (
@@ -768,7 +801,61 @@ const PostDetail = () => {
             </div>
           </form>
         </Modal>
-
+        <Modal
+            isOpen={showCreatePlanModal}
+            onRequestClose={() => setShowCreatePlanModal(false)}
+            contentLabel="새 플랜 만들기"
+            ariaHideApp={false}
+            style={{
+              content: {
+                zIndex: 1000,
+                width: '400px',
+                margin: '0 auto',
+                padding: '20px',
+                borderRadius: '10px',
+                border: '1px solid #ccc',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+              }
+            }}
+        >
+          <h2 style={{ textAlign: 'center' }}>새 플랜 만들기</h2>
+          <input
+              type="text"
+              placeholder="플랜 제목을 입력하세요"
+              value={newPlanTitle}
+              onChange={(e) => setNewPlanTitle(e.target.value)}
+              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc', marginBottom: '20px' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            <button
+                onClick={handleCreatePlan}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '15px',
+                  border: '2px solid #ccc',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  cursor: 'pointer',
+                  width: '100%',
+                }}
+            >
+              플랜 생성
+            </button>
+            <button
+                onClick={() => setShowCreatePlanModal(false)}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '15px',
+                  border: '2px solid #ccc',
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  width: '100%',
+                }}
+            >
+              취소
+            </button>
+          </div>
+        </Modal>
       </div>
   );
 };

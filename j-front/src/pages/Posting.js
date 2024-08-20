@@ -38,7 +38,8 @@ function Posting() {
         });
         setLoggedInUserId(response.data.data.userId);
       } catch (error) {
-        console.error('Error fetching logged-in user details:', error);
+        console.error('유저 정보를 가져오는데 실패했습니다.', error);
+        window.alert(`유저 정보를 가져오는데 실패했습니다: ${error.response.data.message}`);
       }
     };
     fetchLoggedInUser();
@@ -62,7 +63,7 @@ function Posting() {
           if (status === window.kakao.maps.services.Status.OK) {
             setSearchResults(data);
           } else {
-            console.error('Search failed:', status);
+            window.alert(`검색에 실패했습니다. ${status}`);
           }
         });
       };
@@ -81,7 +82,7 @@ function Posting() {
               placeName: place.place_name
             }));
           } else {
-            console.error('Failed to get address from coordinates:', status);
+            window.alert(`주소 검색에 실패했습니다. ${status}`);
           }
         });
       };
@@ -106,15 +107,15 @@ function Posting() {
       script.onload = () => {
         window.kakao.maps.load(() => {
           setMapsLoaded(true);
-          console.log('Kakao Maps API loaded');
+          console.log('Kakao Maps API 를 불러왔습니다.');
         });
       };
       script.onerror = () => {
-        console.error('Failed to load Kakao Maps API script');
+        console.error('Kakao Maps API를 불러오는데 실패했습니다.');
       };
       document.body.appendChild(script);
     } else {
-      console.log('Kakao Maps API script already loaded');
+      console.log('Kakao Maps API가 이미 불러와져있습니다.');
     }
   };
 
@@ -165,12 +166,12 @@ function Posting() {
 
       if (postResponse.data && postResponse.data.data) {
         // 성공적으로 게시물 작성 후 메시지 표시
-        prompt("포스팅 완료 !")
+        alert("포스팅 완료 !")
         navigate(`/posts/${postResponse.data.data.id}`) // 메시지 표시 후 페이지 이동
         }
 
     } catch (error) {
-      console.error('Failed to create post:', error);
+      console.error('게시물 작성에 실패했습니다.');
       toast.error('게시물 작성에 실패했습니다.');
     }
   };
@@ -187,7 +188,7 @@ function Posting() {
 
   const handleSearch = (query) => {
     if (!mapsLoaded) {
-      console.error('Kakao Maps API is not loaded');
+      console.error('Kakao Maps API 를 불러오지 못했습니다.');
       return;
     }
 
@@ -196,7 +197,7 @@ function Posting() {
       if (status === window.kakao.maps.services.Status.OK) {
         setSearchResults(data);
       } else {
-        console.error('Search failed:', status);
+        window.alert(`검색에 실패했습니다: ${status}`);
       }
     });
   };
