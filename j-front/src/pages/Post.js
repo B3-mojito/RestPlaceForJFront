@@ -87,6 +87,11 @@ function PostList() {
   };
 
   const handleSearch = () => {
+    // Check if region or theme is selected
+    if (!region || !theme) {
+      window.alert('지역과 테마를 선택해주세요!');
+      return;
+    }
     setCurrentPage(1);
     fetchPlaces(1);
   };
@@ -178,8 +183,8 @@ function PostList() {
               <FloatingLabel controlId="sortBySelect"
                              label="정렬 기준을 선택해주세요">
                 <Form.Select as="select" value={sortBy}
-                              onChange={handleSortChange}
-                              className="sort-select">
+                             onChange={handleSortChange}
+                             className="sort-select">
                   <option value="createdAt">최신순</option>
                   <option value="viewsCount">조회순</option>
                   <option value="likesCount">추천순</option>

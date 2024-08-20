@@ -165,7 +165,7 @@ function Posting() {
 
       if (postResponse.data && postResponse.data.data) {
         // 성공적으로 게시물 작성 후 메시지 표시
-        prompt("포스팅 완료 !")
+        alert("포스팅 완료 !")
         navigate(`/posts/${postResponse.data.data.id}`) // 메시지 표시 후 페이지 이동
         }
 

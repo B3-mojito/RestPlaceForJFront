@@ -18,6 +18,7 @@ function MyPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [plans, setPlans] = useState([]);
     const [posts, setPosts] = useState([]);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [newPlanTitle, setNewPlanTitle] = useState('');
     const [isImageChanged, setIsImageChanged] = useState(false); // Track if the image has been changed
     const navigate = useNavigate();
@@ -54,6 +55,7 @@ function MyPage() {
             setPlans([...plans, response.data.data]);
             setShowPlanModal(false);
             setNewPlanTitle('');
+            window.location.reload();
         } catch (error) {
             console.error('Failed to create plan:', error);
         }
@@ -74,6 +76,32 @@ function MyPage() {
             setProfileImagePreview(data.profileImage ? `${data.profileImage}` : null);
         } catch (error) {
             console.error('Error fetching user profile:', error);
+        }
+    };
+    const handleSavePasswordChanges = async () => {
+        try {
+            const payload = {
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword,
+            };
+
+            const response = await apiClient.patch(`/users/${userId}/password`, payload, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${localStorage.getItem('authToken')}`,
+                },
+            });
+
+            window.alert('비밀번호가 성공적으로 변경되었습니다.');
+            setShowPasswordModal(false);
+        } catch (error) {
+            console.error('Error updating password:', error);
+            if (error.response && error.response.data && error.response.data.message) {
+                window.alert(`비밀번호 변경에 실패했습니다: ${error.response.data.message}`);
+            } else {
+                window.alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+            }
         }
     };
 
@@ -120,9 +148,34 @@ function MyPage() {
         }
     };
 
+    const handleSaveImage = async () => {
+        if (isImageChanged && profileImage) {
+            try {
+                const formData = new FormData();
+                formData.append('images', profileImage); // Match with backend @RequestPart("images")
+
+                const imageResponse = await apiClient.post(`/users/myPage/profile-image`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `${localStorage.getItem('authToken')}`
+                    },
+                });
+
+                const { profileImage: newProfileImage } = imageResponse.data.data;
+                setProfileImage(newProfileImage);
+                setProfileImagePreview(`https://api.restplaceforj.com/images/${newProfileImage}`);
+                window.alert('프로필 이미지가 성공적으로 업데이트되었습니다.');
+                setIsImageChanged(false);
+                window.location.reload();
+            } catch (error) {
+                console.error('Error updating profile image:', error);
+                window.alert('프로필 이미지 업데이트에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+    };
+
     const handleSaveChanges = async () => {
         try {
-            // 먼저 프로필 정보를 업데이트
             const payload = {
                 nickname: nickname,
                 bio: bio,
@@ -141,23 +194,6 @@ function MyPage() {
             const { data } = profileResponse.data;
             setNickname(data.nickname);
             setBio(data.bio);
-
-            // 만약 프로필 이미지가 선택된 경우에만 업로드 처리
-            if (isImageChanged) {
-                const formData = new FormData();
-                formData.append('images', profileImage); // Match with backend @RequestPart("images")
-
-                const imageResponse = await apiClient.post(`/users/myPage/profile-image`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        Authorization: `${localStorage.getItem('authToken')}`
-                    },
-                });
-
-                const { profileImage: newProfileImage } = imageResponse.data.data;
-                setProfileImage(newProfileImage);
-                setProfileImagePreview(`https://api.restplaceforj.com/images/${newProfileImage}`);
-            }
 
             setShowProfileModal(false);
             window.alert('프로필이 성공적으로 업데이트되었습니다.');
@@ -186,7 +222,9 @@ function MyPage() {
 
                 if (response.status === 200) {
                     localStorage.removeItem('authToken');
+                    localStorage.removeItem('RefreshToken');
                     window.alert('계정이 성공적으로 탈퇴되었습니다.');
+                    navigate('/');
                 } else {
                     console.error('Unexpected response status:', response.status);
                     window.alert('계정 탈퇴에 실패했습니다. 다시 시도해주세요.');
@@ -217,17 +255,37 @@ function MyPage() {
             <div className="profile-section">
                 <div className="profile-image">
                     {profileImagePreview ? (
-                        <img src={profileImagePreview} alt="Profile" />
+                        <img src={profileImagePreview} alt="Profile" onClick={() => document.getElementById('profileImageInput').click()} />
                     ) : (
                         <div>{'{path}'}</div>
+                    )}
+                    <input
+                        type="file"
+                        id="profileImageInput"
+                        accept="image/*"
+                        onChange={handleProfileImageChange}
+                        style={{ display: 'none' }}
+                    />
+                    {isImageChanged && (
+                        <Button variant="primary" onClick={handleSaveImage}>
+                            저장
+                        </Button>
                     )}
                 </div>
                 <div className="profile-info">
                     <h2 className="nickname">{nickname}</h2>
                     <p className="bio">{bio}</p>
                     <div className="profile-actions">
-                        <button className="btn" onClick={() => setShowProfileModal(true)}>프로필 수정</button>
-                        <button className="btn" onClick={handleDeleteAccount}>회원 탈퇴</button>
+                        <button className="btn"
+                                onClick={() => setShowProfileModal(true)}>프로필 수정
+                        </button>
+                        <button className="btn"
+                                onClick={() => setShowPasswordModal(true)}>비밀번호
+                            변경
+                        </button>
+                        <button className="btn" onClick={handleDeleteAccount}>회원
+                            탈퇴
+                        </button>
                     </div>
                 </div>
             </div>
@@ -293,31 +351,17 @@ function MyPage() {
                 <div className="add-button" onClick={handleAddPost}>+</div>
             </div>
 
-            <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)}>
+            <Modal show={showProfileModal}
+                   onHide={() => setShowProfileModal(false)}>
                 <Modal.Header>
                     <Modal.Title>프로필 수정</Modal.Title>
-                    <Button variant="light" onClick={() => setShowProfileModal(false)}>
-                        <FaTimes />
+                    <Button variant="light"
+                            onClick={() => setShowProfileModal(false)}>
+                        <FaTimes/>
                     </Button>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="modal-profile-section">
-                        <div className="modal-profile-image">
-                            {profileImagePreview ? (
-                                <img src={profileImagePreview} alt="Profile" />
-                            ) : (
-                                <div>{'{path}'}</div>
-                            )}
-                            <label className="upload-button">
-                                <FaPlus />
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleProfileImageChange}
-                                    style={{ display: 'none' }}
-                                />
-                            </label>
-                        </div>
                         <div className="modal-profile-info">
                             <input
                                 type="text"
@@ -331,6 +375,25 @@ function MyPage() {
                                 value={bio || ''}
                                 onChange={(e) => setBio(e.target.value)}
                             />
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={handleSaveChanges}>
+                        <FaCheck/>
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            <Modal show={showPasswordModal} onHide={() => setShowPasswordModal(false)}>
+                <Modal.Header>
+                    <Modal.Title>비밀번호 변경</Modal.Title>
+                    <Button variant="light" onClick={() => setShowPasswordModal(false)}>
+                        <FaTimes />
+                    </Button>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="modal-profile-section">
+                        <div className="modal-profile-info">
                             <input
                                 type="password"
                                 placeholder="현재 비밀번호"
@@ -353,7 +416,7 @@ function MyPage() {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={handleSaveChanges}>
+                    <Button variant="primary" onClick={handleSavePasswordChanges}>
                         <FaCheck />
                     </Button>
                 </Modal.Footer>
