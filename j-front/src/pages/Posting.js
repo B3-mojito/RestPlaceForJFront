@@ -7,6 +7,47 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const styles = {
+  input: {
+    padding: '10px',
+    borderRadius: '8px',
+    border: '1px solid #ddd',
+    marginRight: '10px',
+    width: '100%',
+    boxSizing: 'border-box'
+  },
+  mapContainer: {
+    width: '100%',
+    height: '400px',
+    marginBottom: '20px',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  },
+  searchResultList: {
+    listStyleType: 'none',
+    padding: 0,
+    margin: 0,
+    borderRadius: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    marginTop: '10px',
+    maxHeight: '200px', // Limit the height of the list for better UI
+    overflowY: 'auto', // Add a scroll if there are too many items
+  },
+  searchResultItem: {
+    padding: '10px 15px',
+    borderBottom: '1px solid #ddd',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease, color 0.2s ease',
+  },
+  // Customize the pointer style
+  pointer: {
+    cursor: 'pointer',
+  }
+};
+
 function Posting() {
   const [content, setContent] = useState('');
   const [title, setTitle] = useState(''); // title 상태 추가
@@ -24,7 +65,7 @@ function Posting() {
 
   const mapContainerRef = useRef(null);
   const navigate = useNavigate();
-
+  const [hoveredItemId, setHoveredItemId] = useState(null);
 
 
   useEffect(() => {
@@ -91,33 +132,7 @@ function Posting() {
     }
   }, [mapsLoaded]);
 
-  const loadKakaoMapsScript = () => {
-    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=f90abf763c49b09ee81cd9b1f5f0b3ef&libraries=services,clusterer,drawing&autoload=false";
 
-    if (window.kakao && window.kakao.maps) {
-      setMapsLoaded(true);
-      return;
-    }
-
-    const existingScript = document.getElementById('kakao-maps-script');
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.id = 'kakao-maps-script';
-      script.src = scriptUrl;
-      script.onload = () => {
-        window.kakao.maps.load(() => {
-          setMapsLoaded(true);
-          console.log('Kakao Maps API 를 불러왔습니다.');
-        });
-      };
-      script.onerror = () => {
-        console.error('Kakao Maps API를 불러오는데 실패했습니다.');
-      };
-      document.body.appendChild(script);
-    } else {
-      console.log('Kakao Maps API가 이미 불러와져있습니다.');
-    }
-  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -176,30 +191,125 @@ function Posting() {
     }
   };
 
+  const handleMouseEnter = (placeId) => {
+    setHoveredItemId(placeId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredItemId(null);
+  };
+
+
+  const loadKakaoMapsScript = () => {
+    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=1b3fb716f9111507c799266af6e4a45b&libraries=services,clusterer,drawing&autoload=false"
+    if (window.kakao && window.kakao.maps) {
+      setMapsLoaded(true);
+      return;
+    }
+
+    const existingScript = document.getElementById('kakao-maps-script');
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.id = 'kakao-maps-script';
+      script.src = scriptUrl;
+      script.onload = () => {
+        window.kakao.maps.load(() => {
+          setMapsLoaded(true);
+          console.log('Kakao Maps API loaded');
+        });
+      };
+      script.onerror = () => {
+        console.error('Failed to load Kakao Maps API script');
+      };
+      document.body.appendChild(script);
+    } else {
+      console.log('Kakao Maps API script already loaded');
+    }
+  };
+
+  const initializeMap = () => {
+    const mapContainer = mapContainerRef.current;
+    const southKoreaBounds = new window.kakao.maps.LatLngBounds(
+        new window.kakao.maps.LatLng(33.0, 124.0), // Southwest corner (Jeju Island area)
+        new window.kakao.maps.LatLng(38.5, 132.0)  // Northeast corner (near Ulleungdo)
+    );
+    const mapOptions = {
+      center: new window.kakao.maps.LatLng(37.5665, 126.978), // Center the map on Seoul
+      level: 3, // Zoom level (adjust as needed)
+      maxLevel: 10 // Restrict max zoom out level to avoid seeing North Korea
+    };
+
+    const map = new window.kakao.maps.Map(mapContainer, mapOptions);
+    const ps = new window.kakao.maps.services.Places();
+    const geocoder = new window.kakao.maps.services.Geocoder();
+
+    map.setBounds(southKoreaBounds); // Set the maximum bounds to the defined area
+    const searchPlaces = (query) => {
+      ps.keywordSearch(query, (data, status) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          setSearchResults(data);
+        } else {
+          console.error('Search failed:', status);
+        }
+      });
+    };
+
+    const handleSearchInput = (e) => {
+      const query = e.target.value;
+      if (query.length > 2) {
+        searchPlaces(query);
+      } else {
+        setSearchResults([]);
+      }
+    };
+
+    const handleMapClick = (mouseEvent) => {
+      const latlng = mouseEvent.latLng;
+      const lat = latlng.getLat();
+      const lng = latlng.getLng();
+
+      geocoder.coord2Address(lng, lat, (result, status) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const address = result[0].address.address_name;
+          alert(`Latitude: ${lat}, Longitude: ${lng}, Address: ${address}`);
+        } else {
+          alert(`Latitude: ${lat}, Longitude: ${lng}`);
+        }
+      });
+    };
+
+    window.kakao.maps.event.addListener(map, 'click', handleMapClick);
+  };
+
+  const handleSearch = (query) => {
+    if (!mapsLoaded) {
+      console.error('Kakao Maps API is not loaded');
+      return;
+    }
+
+    const places = window.kakao.maps.services.Places;
+    if (!places) {
+      console.error('Places service is not available');
+      return;
+    }
+
+    const ps = new places();
+    ps.keywordSearch(query, (data, status) => {
+      if (status === window.kakao.maps.services.Status.OK) {
+        setSearchResults(data);
+      } else {
+        console.error('Search failed:', status);
+      }
+    });
+  };
+
   const handleSearchChange = (e) => {
     const query = e.target.value;
-    setSearchQuery(query);
     if (query.length > 2) {
       handleSearch(query);
     } else {
       setSearchResults([]);
     }
-  };
-
-  const handleSearch = (query) => {
-    if (!mapsLoaded) {
-      console.error('Kakao Maps API 를 불러오지 못했습니다.');
-      return;
-    }
-
-    const ps = new window.kakao.maps.services.Places();
-    ps.keywordSearch(query, (data, status) => {
-      if (status === window.kakao.maps.services.Status.OK) {
-        setSearchResults(data);
-      } else {
-        window.alert(`검색에 실패했습니다: ${status}`);
-      }
-    });
   };
 
   const handlePlaceSelect = (place) => {
@@ -208,7 +318,6 @@ function Posting() {
       address: place.address_name,
       placeName: place.place_name
     }));
-    setSearchQuery('');
     setSearchResults([]);
   };
 
@@ -245,12 +354,22 @@ function Posting() {
           <div>
             <input
                 type="text"
-                placeholder="장소를 검색하세요!"
+                placeholder="방문할 장소를 검색하세요 (최소 3자이상 입력)"
                 onChange={handleSearchChange}
+                style={styles.input}
             />
-            <ul>
+            <ul style={styles.searchResultList}>
               {searchResults.map((place) => (
-                  <li key={place.id} onClick={() => handlePlaceSelect(place)}>
+                  <li key={place.id}
+                      onClick={() => handlePlaceSelect(place)}
+                      onMouseEnter={() => handleMouseEnter(place.id)}
+                      onMouseLeave={handleMouseLeave}
+                      style={{
+                        ...styles.searchResultItem,
+                        ...(hoveredItemId === place.id
+                            ? styles.searchResultItemHover : {}),
+                      }}
+                  >
                     {place.place_name} ({place.address_name})
                   </li>
               ))}
