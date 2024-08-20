@@ -18,7 +18,7 @@ function PostList() {
   const navigate = useNavigate();
   const [q, setQ] = useState('');
 
-  const regions = ["서울", "경기", "인천", "대전", "대구", "부산", "울산", "경남", "경북", "강원", "충남", "전남", "제주"];
+  const regions = ["서울", "경기", "인천", "대전", "대구", "충북", "광주", "부산", "울산", "경남", "경북", "강원", "충남", "전남", "전북", "제주"];
   const themes = [
     { value: "HEALING", label: "힐링하고 싶어요" },
     { value: "THRILL", label: "스릴을 즐기고 싶어요" },
