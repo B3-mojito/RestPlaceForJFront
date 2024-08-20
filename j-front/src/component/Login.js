@@ -52,6 +52,9 @@ const Login = ({ toggle }) => {
       alert('로그인 실패...');
     }
   };
+  const handleKakaoLogin = () => {
+    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=6f65bf43b64eb76a47ee7c87702d19b2&redirect_uri=https://restplaceforj.com/oauth/kakao/callback&response_type=code';
+  };
 
   return (
       <>
@@ -86,6 +89,7 @@ const Login = ({ toggle }) => {
               <Button variant="success" type="submit" className="login-button">
                 로그인
               </Button>
+              <Button className="kakao-login-button mt-3" onClick={handleKakaoLogin}> 카카오 로그인 </Button>
             </Form>
           </div>
         </div>
