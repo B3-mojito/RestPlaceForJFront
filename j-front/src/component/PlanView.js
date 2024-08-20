@@ -206,7 +206,7 @@ function Plan() {
       });
       setColumns(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch columns:', error);
+      console.error('Failed to fetch columns:', error.response.data.message);
     }
   };
 
@@ -219,7 +219,7 @@ function Plan() {
       });
       setCoworkers(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch coworkers:', error);
+      console.error('Failed to fetch coworkers:', error.response.data.message);
     }
   };
 
@@ -238,7 +238,7 @@ function Plan() {
       setEditModalVisible(false);
       fetchColumns2();
     } catch (error) {
-      console.error('Failed to update column:', error);
+      console.error('Failed to update column:', error.response.data.message);
     }
   };
 
@@ -361,7 +361,7 @@ function Plan() {
       });
       setPlanTitle(response.data.data.title);
     } catch (error) {
-      console.error('Failed to fetch plan data:', error);
+      console.error('Failed to fetch plan data:', error.response.data.message);
     }
   };
 
@@ -376,7 +376,7 @@ function Plan() {
       setColumns(response.data.data);
       fetchCardsForColumns(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch columns:', error);
+      console.error('Failed to fetch columns:', error.response.data.message);
     }
   };
 
@@ -391,7 +391,7 @@ function Plan() {
         });
         cardsData[column.id] = response.data.data;
       } catch (error) {
-        console.error(`Failed to fetch cards for column ${column.id}:`, error);
+        console.error(`Failed to fetch cards for column ${column.id}:`, error.response.data.message);
       }
     }
     setCards(cardsData);
@@ -406,7 +406,7 @@ function Plan() {
       setIsEditing(false);
       await fetchPlanData();
     } catch (error) {
-      console.error('Failed to update plan title:', error);
+      console.error('Failed to update plan title:', error.response.data.message);
     }
   };
 
@@ -420,7 +420,7 @@ function Plan() {
       setNewColumnTitle('');
       setNewColumnDate('');
     } catch (error) {
-      console.error('Failed to add column:', error);
+      console.error('Failed to add column:', error.response.data.message);
     }
   };
 
@@ -436,7 +436,7 @@ function Plan() {
         console.log("플랜 삭제 완료");
         window.location.href = '/plan'; // 홈 페이지로 리다이렉트
       } catch (error) {
-        console.error('Error deleting plan:', error);
+        console.error('Error deleting plan:', error.response.data.message);
       }
     } else {
       console.log("플랜 삭제가 취소되었습니다.");
@@ -454,7 +454,7 @@ function Plan() {
         console.log("일차 삭제 완료");
         fetchColumns();
       } catch (error) {
-        console.error('Error deleting plan:', error);
+        console.error('Error deleting plan:', error.response.data.message);
       }
     } else {
       console.log("일차 삭제가 취소되었습니다.");
@@ -474,7 +474,7 @@ function Plan() {
         console.log("일정 삭제 완료");
         fetchColumns();
       } catch (error) {
-        console.error('Error deleting plan:', error);
+        console.error('Error deleting plan:', error.response.data.message);
       }
     } else {
       console.log("일정 삭제가 취소되었습니다.");
@@ -503,7 +503,7 @@ function Plan() {
       // 일정 추가 후 모달 닫기
       closeAddCardModal();
     } catch (error) {
-      console.error('Failed to add card:', error);
+      console.error('Failed to add card:', error.response.data.message);
     }
   };
 
@@ -547,7 +547,7 @@ function Plan() {
           };
         });
       } catch (error) {
-        console.error('Failed to update card column:', error);
+        console.error('Failed to update card column:', error.response.data.message);
       }
     } else {
       setCards(prevCards => {
@@ -582,7 +582,7 @@ function Plan() {
 
       setRelatedPosts(response.data.data.contentList);
     } catch (error) {
-      console.error('Failed to fetch related posts:', error);
+      console.error('Failed to fetch related posts:', error.response.data.message);
     }
   };
 
@@ -622,7 +622,7 @@ function Plan() {
       setEditingCardId(null);
       fetchColumns();
     } catch (error) {
-      console.error('Failed to update card:', error);
+      console.error('Failed to update card:', error.response.data.message);
     }
   };
 
@@ -689,7 +689,7 @@ function Plan() {
       closeInviteModal();
       alert("Invitation sent successfully!");
     } catch (error) {
-      console.error('Failed to send invitation:', error);
+      console.error('Failed to send invitation:', error.response.data.message);
     }
   };
 

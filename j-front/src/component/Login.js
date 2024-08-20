@@ -38,9 +38,7 @@ const Login = ({ toggle }) => {
           window.location.reload();
           alert('로그인 성공!');
         } else {
-          // Handle the case where token or refreshToken is not present
-          console.error('Token or refreshToken not found in response headers');
-          alert('로그인 실패...');
+          alert('로그인 실패 : 토큰을 찾을수 없음');
         }
       } else {
         const errorData = await response.json();
@@ -48,7 +46,7 @@ const Login = ({ toggle }) => {
         alert(`로그인 실패: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Error during sign in:', error);
+      console.error('로그인 에러:', error.response.data.message);
       alert('로그인 실패...');
     }
   };

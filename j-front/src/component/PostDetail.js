@@ -48,7 +48,7 @@ const PostDetail = () => {
       });
       setLoggedInUserId(response.data.data.userId);
     } catch (error) {
-      console.error('Error fetching logged-in user details:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -62,7 +62,7 @@ const PostDetail = () => {
       });
       setPost(response.data.data);
     } catch (error) {
-      console.error('Error fetching post details:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -76,7 +76,7 @@ const PostDetail = () => {
       });
       setPostImage(response.data.data.path);
     } catch (error) {
-      console.error('Error fetching post image:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -90,7 +90,7 @@ const PostDetail = () => {
       });
       setPlans(response.data.data);
     } catch (error) {
-      console.error('Error fetching plans:', error);
+      console.error("플랜이 존재하지 않거나"+ error.response.data.message);
     }
   };
 
@@ -104,7 +104,7 @@ const PostDetail = () => {
       });
       setCards(response.data.data);
     } catch (error) {
-      console.error('Error fetching cards:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -124,7 +124,7 @@ const PostDetail = () => {
       setComments(contentList);
       setTotalPages(totalPages);
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -154,7 +154,7 @@ const PostDetail = () => {
       setNewPlanTitle('');
       fetchPlans(); // Refresh the plans list
     } catch (error) {
-      console.error('Failed to create plan:', error);
+      console.error(error.response.data.message);
     }
   };
   const handleCommentSubmit = async () => {
@@ -175,7 +175,7 @@ const PostDetail = () => {
         fetchComments();
       }
     } catch (error) {
-      console.error('Error submitting comment:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -209,7 +209,7 @@ const PostDetail = () => {
         });
         navigate('/');
       } catch (error) {
-        console.error('Error deleting the post:', error);
+        console.error('Error deleting the post:', error.response.data.message);
       }
     }
   };
@@ -231,7 +231,7 @@ const PostDetail = () => {
         fetchPost();
       }
     } catch (error) {
-      console.error('Error liking the post:', error);
+      console.error('Error liking the post:', error.response.data.message);
     }
   };
 
@@ -252,7 +252,7 @@ const PostDetail = () => {
         fetchComments();
       }
     } catch (error) {
-      console.error('Error liking the comment:', error);
+      console.error('Error liking the comment:', error.response.data.message);
     }
   };
 
@@ -294,7 +294,7 @@ const PostDetail = () => {
           closeModal();
         }
       } catch (error) {
-        console.error('Error updating card:', error);
+        console.error('Error updating card:', error.response.data.message);
       }
     } else {
       try {
@@ -313,7 +313,7 @@ const PostDetail = () => {
           closeModal();
         }
       } catch (error) {
-        console.error('Error adding card to plan:', error);
+        console.error('Error adding card to plan:', error.response.data.message);
       }
     }
   };
@@ -342,7 +342,7 @@ const PostDetail = () => {
         fetchComments();
       }
     } catch (error) {
-      console.error('Error updating comment:', error);
+      console.error('Error updating comment:', error.response.data.message);
     }
   };
 
@@ -361,7 +361,7 @@ const PostDetail = () => {
 
         fetchComments();
       } catch (error) {
-        console.error('Error deleting comment:', error);
+        console.error('Error deleting comment:', error.response.data.message);
       }
     }
   };

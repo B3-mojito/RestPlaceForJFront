@@ -19,7 +19,7 @@ const refreshToken = async () => {
       return newToken;
     }
   } catch (error) {
-    console.error('Error refreshing token:', error);
+    console.error('토큰 재발급 실패:', error.response.data.message);
     // Redirect to login page or handle error
     window.location.href = '/login';
     return null;

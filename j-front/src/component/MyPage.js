@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import './MyPage.css';
-import { Modal, Button, Form } from 'react-bootstrap';
-import { FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
+import {Button, Form, Modal} from 'react-bootstrap';
+import {FaCheck, FaTimes} from 'react-icons/fa';
 import apiClient from "../helpers/apiClient";
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 function MyPage() {
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -35,7 +35,7 @@ function MyPage() {
         });
         setPlans(response.data.data);
       } catch (error) {
-        console.error('Failed to fetch plans:', error);
+        console.error('유저를 찾을수 없거나', error.response.data.message);
       }
     };
 
@@ -59,7 +59,7 @@ function MyPage() {
       setNewPlanTitle('');
       window.location.reload();
     } catch (error) {
-      console.error('Failed to create plan:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -77,7 +77,7 @@ function MyPage() {
       setProfileImage(data.profileImage);
       setProfileImagePreview(data.profileImage ? `${data.profileImage}` : null);
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error(error.response.data.message);
     }
   };
   const handleSavePasswordChanges = async () => {
@@ -95,10 +95,10 @@ function MyPage() {
         },
       });
 
-      window.alert('비밀번호가 성공적으로 변경되었습니다.');
+      window.alert(response.data.message);
       setShowPasswordModal(false);
     } catch (error) {
-      console.error('Error updating password:', error);
+      console.error('비밀번호 변경에 실패했습니다:', error.response.data.message);
       if (error.response && error.response.data && error.response.data.message) {
         window.alert(`비밀번호 변경에 실패했습니다: ${error.response.data.message}`);
       } else {
@@ -117,7 +117,7 @@ function MyPage() {
       const { data } = response.data;
       setPlans(data);
     } catch (error) {
-      console.error('Error fetching user plans:', error);
+      console.error( "플랜이 존재하지 않거나 " + error.response.data.message);
     }
   };
 
@@ -132,7 +132,7 @@ function MyPage() {
       setPosts(contentList);
       setTotalPages(totalPages);
     } catch (error) {
-      console.error('Error fetching user posts:', error);
+      console.error(error.response.data.message);
     }
   };
 
@@ -171,7 +171,7 @@ function MyPage() {
         setIsImageChanged(false);
         window.location.reload();
       } catch (error) {
-        console.error('Error updating profile image:', error);
+        console.error('이미지 업데이트 실패:', error.response.data.message);
         window.alert('프로필 이미지 업데이트에 실패했습니다. 다시 시도해주세요.');
       }
     }
@@ -199,9 +199,10 @@ function MyPage() {
       setBio(data.bio);
 
       setShowProfileModal(false);
+      console.log(profileResponse.data.message);
       window.alert('프로필이 성공적으로 업데이트되었습니다.');
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('프로필 업데이트 실패:', error.response.data.message);
       if (error.response && error.response.data && error.response.data.message) {
         window.alert(`프로필 업데이트에 실패했습니다: ${error.response.data.message}`);
       } else {
@@ -229,13 +230,13 @@ function MyPage() {
           window.alert('계정이 성공적으로 탈퇴되었습니다.');
           navigate('/');
         } else {
-          console.error('Unexpected response status:', response.status);
+          console.error('탈퇴 실패:', response.data.message);
           window.alert('계정 탈퇴에 실패했습니다. 다시 시도해주세요.');
         }
       } catch (error) {
-        console.error('Error deleting account:', error);
+        console.error('탈퇴 실패:', error.response.data.message);
         if (error.response && error.response.status === 401) {
-          window.alert('비밀번호가 올바르지 않습니다.');
+          window.alert(error.response.data.message);
         } else {
           window.alert('계정 탈퇴에 실패했습니다. 다시 시도해주세요.');
         }

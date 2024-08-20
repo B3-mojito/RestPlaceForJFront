@@ -22,7 +22,7 @@ function Header() {
       });
       login(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch user profile:', error);
+      console.error(error.response.data.message);
     }
   };
 
