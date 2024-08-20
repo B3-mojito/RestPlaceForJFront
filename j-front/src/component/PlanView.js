@@ -272,7 +272,7 @@ function Plan() {
   }, [mapsLoaded]);
 
   const loadKakaoMapsScript = () => {
-    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a84090a0ae739cccb8c34d58fca902b1&libraries=services,clusterer,drawing&autoload=false"
+    const scriptUrl = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=1b3fb716f9111507c799266af6e4a45b&libraries=services,clusterer,drawing&autoload=false"
     if (window.kakao && window.kakao.maps) {
       setMapsLoaded(true);
       return;
